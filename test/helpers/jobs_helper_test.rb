@@ -1,6 +1,6 @@
 require "test_helper"
 
-class MissionControl::Jobs::JobsHelperTest < ActionView::TestCase
+class FlightControl::JobsHelperTest < ActionView::TestCase
   class JobWithRegularHashArguments < ApplicationJob
     def perform(value, options)
     end

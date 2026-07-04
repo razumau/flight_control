@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Flight Control - <%= page_title %></title>
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="turbo-cache-control" content="no-cache">
+
+  <%= stylesheet_link_tag "flight_control/bulma.min" %>
+  <%= stylesheet_link_tag "flight_control/application", "data-turbo-track": "reload" %>
+  <%= javascript_importmap_tags "application", importmap: FlightControl.importmap  %>
+</head>
+<body>
+
+<section class="section">
+  <div class="container">
+    <%= render "layouts/flight_control/application_selection" %>
+    <%= render "layouts/flight_control/flash" %>
+    <%= render "layouts/flight_control/navigation" %>
+    <%= yield %>
+  </div>
+</section>
+
+</body>
+</html>

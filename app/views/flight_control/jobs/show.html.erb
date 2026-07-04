@@ -1,0 +1,6 @@
+<% navigation(title: "Job #{@job.job_id}", section: navigation_section_for_status(@job.status)) %>
+
+<%= render "flight_control/jobs/title", job: @job %>
+<%= render "flight_control/jobs/general_information", job: @job %>
+<%= render "flight_control/jobs/error_information", job: @job %>
+<%= render "flight_control/jobs/raw_data", job: @job %>

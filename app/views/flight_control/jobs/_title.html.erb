@@ -1,0 +1,19 @@
+<h1 class="title">
+  <div class="level">
+    <div class="level-left">
+      <%= job_title(job) %>
+      <div class="<%= modifier_for_status(job.status) %> tag ml-4"><%= job.status %></div>
+    </div>
+    <div class="level-right">
+      <% if job.failed? %>
+        <%= render "flight_control/jobs/failed/actions", job: job %>
+      <% end %>
+      <% if job.blocked? %>
+        <%= render "flight_control/jobs/blocked/actions", job: job %>
+      <% end %>
+      <% if job.scheduled? %>
+        <%= render "flight_control/jobs/scheduled/actions", job: job %>
+      <% end %>
+    </div>
+  </div>
+</h1>

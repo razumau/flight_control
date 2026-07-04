@@ -29,7 +29,7 @@ class ActiveJob::JobsRelation
   attr_reader *PROPERTIES, :default_page_size
 
   delegate :last, :[], :reverse, to: :to_a
-  delegate :logger, to: MissionControl::Jobs
+  delegate :logger, to: FlightControl
 
   ALL_JOBS_LIMIT = 100_000_000 # When no limit value it defaults to "all jobs"
 
@@ -313,6 +313,6 @@ class ActiveJob::JobsRelation
     end
 
     def wait_batch_delay
-      sleep MissionControl::Jobs.delay_between_bulk_operation_batches if MissionControl::Jobs.delay_between_bulk_operation_batches.to_i > 0
+      sleep FlightControl.delay_between_bulk_operation_batches if FlightControl.delay_between_bulk_operation_batches.to_i > 0
     end
 end

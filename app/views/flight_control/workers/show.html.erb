@@ -1,0 +1,14 @@
+<% navigation(title: "Worker #{@worker.id}", section: :workers) %>
+
+<%= render "flight_control/workers/title", worker: @worker %>
+<%= render "flight_control/workers/configuration", worker: @worker %>
+
+<% if @worker.jobs.empty? %>
+  <%= blank_status_notice "This worker is idle" %>
+<% else %>
+  <h2 class="subtitle">Running <%= pluralize @worker.jobs.size, "job" %></h2>
+
+  <%= render "flight_control/shared/jobs", jobs: @worker.jobs %>
+<% end %>
+
+<%= render "flight_control/workers/raw_data", worker: @worker %>

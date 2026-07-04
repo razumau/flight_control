@@ -25,7 +25,7 @@ module ActiveJob::QueueAdapters::SolidQueueExt::Workers
     end
 
     def worker_from_solid_queue_process(process)
-      MissionControl::Jobs::Worker.new(queue_adapter: self, **worker_attributes_from_solid_queue_process(process))
+      FlightControl::Worker.new(queue_adapter: self, **worker_attributes_from_solid_queue_process(process))
     end
 
     def worker_attributes_from_solid_queue_process(process)

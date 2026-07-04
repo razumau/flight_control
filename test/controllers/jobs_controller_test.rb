@@ -1,6 +1,6 @@
 require "test_helper"
 
-class MissionControl::Jobs::JobsControllerTest < ActionDispatch::IntegrationTest
+class FlightControl::JobsControllerTest < ActionDispatch::IntegrationTest
   setup do
     DummyJob.queue_as :queue_1
     DummyReloadedJob.queue_as :queue_2
@@ -9,14 +9,14 @@ class MissionControl::Jobs::JobsControllerTest < ActionDispatch::IntegrationTest
   test "get job details" do
     job = DummyJob.perform_later(42)
 
-    get mission_control_jobs.application_job_url(@application, job.job_id)
+    get flight_control.application_job_url(@application, job.job_id)
     assert_response :ok
 
     assert_select "h1", /DummyJob\s+pending/
     assert_includes response.body, job.job_id
     assert_select "div.tag a", "queue_1"
 
-    get mission_control_jobs.application_job_url(@application, job.job_id, filter: { queue_name: "queue_1" })
+    get flight_control.application_job_url(@application, job.job_id, filter: { queue_name: "queue_1" })
     assert_response :ok
 
     assert_select "h1", /DummyJob\s+pending/
@@ -29,13 +29,13 @@ class MissionControl::Jobs::JobsControllerTest < ActionDispatch::IntegrationTest
 
     perform_enqueued_jobs_async
 
-    get mission_control_jobs.application_jobs_url(@application, :finished)
+    get flight_control.application_jobs_url(@application, :finished)
     assert_response :ok
 
     assert_select "tr.job", 2
     assert_select "tr.job", /AutoRetryingJob\s+Enqueued less than 5 seconds ago\s+default/
 
-    get mission_control_jobs.application_job_url(@application, job.job_id)
+    get flight_control.application_job_url(@application, job.job_id)
     assert_response :ok
 
     assert_select "h1", /AutoRetryingJob\s+failed\s+/
@@ -49,19 +49,19 @@ class MissionControl::Jobs::JobsControllerTest < ActionDispatch::IntegrationTest
         job = DummyJob.perform_later(42)
         perform_enqueued_jobs_async
 
-        get mission_control_jobs.application_jobs_url(@application, :finished)
+        get flight_control.application_jobs_url(@application, :finished)
         assert_response :ok
         assert_select "tr.job", 1
 
-        get mission_control_jobs.application_jobs_url(@application, :finished, filter: { finished_at_start: 1.hour.from_now.strftime("%Y-%m-%dT%H:%M") })
+        get flight_control.application_jobs_url(@application, :finished, filter: { finished_at_start: 1.hour.from_now.strftime("%Y-%m-%dT%H:%M") })
         assert_response :ok
         assert_select "tr.job", 0
 
-        get mission_control_jobs.application_jobs_url(@application, :finished, filter: { finished_at_start: 1.hour.ago.strftime("%Y-%m-%dT%H:%M"), finished_at_end: 1.hour.from_now.strftime("%Y-%m-%dT%H:%M") })
+        get flight_control.application_jobs_url(@application, :finished, filter: { finished_at_start: 1.hour.ago.strftime("%Y-%m-%dT%H:%M"), finished_at_end: 1.hour.from_now.strftime("%Y-%m-%dT%H:%M") })
         assert_response :ok
         assert_select "tr.job", 1
 
-        get mission_control_jobs.application_jobs_url(@application, :finished, filter: { finished_at_end: 1.hour.from_now.strftime("%Y-%m-%dT%H:%M") })
+        get flight_control.application_jobs_url(@application, :finished, filter: { finished_at_end: 1.hour.from_now.strftime("%Y-%m-%dT%H:%M") })
         assert_response :ok
         assert_select "tr.job", 1
       end
@@ -71,8 +71,8 @@ class MissionControl::Jobs::JobsControllerTest < ActionDispatch::IntegrationTest
   test "redirect to queue when job doesn't exist" do
     job = DummyJob.perform_later(42)
 
-    get mission_control_jobs.application_job_url(@application, job.job_id + "0", filter: { queue_name: "queue_1" })
-    assert_redirected_to mission_control_jobs.application_queue_path(@application, :queue_1)
+    get flight_control.application_job_url(@application, job.job_id + "0", filter: { queue_name: "queue_1" })
+    assert_redirected_to flight_control.application_queue_path(@application, :queue_1)
   end
 
   test "get scheduled jobs" do
@@ -81,7 +81,7 @@ class MissionControl::Jobs::JobsControllerTest < ActionDispatch::IntegrationTest
 
     travel_to 2.minutes.from_now
 
-    get mission_control_jobs.application_jobs_url(@application, :scheduled)
+    get flight_control.application_jobs_url(@application, :scheduled)
     assert_response :ok
 
     assert_select "tr.job", 2
@@ -94,15 +94,15 @@ class MissionControl::Jobs::JobsControllerTest < ActionDispatch::IntegrationTest
     DummyJob.set(wait: 5.minutes).perform_later(37)
     DummyJob.set(wait: 7.minutes).perform_later(42)
 
-    get mission_control_jobs.application_jobs_url(@application, :scheduled)
+    get flight_control.application_jobs_url(@application, :scheduled)
     assert_response :ok
     assert_select "tr.job", 2 do # lists two jobs
       assert_select "div.tag", text: /delayed/, count: 0 # no delayed tag
     end
 
-    travel 5.minutes + MissionControl::Jobs.scheduled_job_delay_threshold + 1.second
+    travel 5.minutes + FlightControl.scheduled_job_delay_threshold + 1.second
 
-    get mission_control_jobs.application_jobs_url(@application, :scheduled)
+    get flight_control.application_jobs_url(@application, :scheduled)
     assert_response :ok
     assert_select "tr.job", 2 do # lists two jobs
       assert_select "div.tag", text: /delayed/, count: 1 # total of one delayed tag
@@ -115,7 +115,7 @@ class MissionControl::Jobs::JobsControllerTest < ActionDispatch::IntegrationTest
     DummyJob.set(wait: 3.minutes).perform_later
 
     I18n.with_locale(:nl) do
-      get mission_control_jobs.application_jobs_url(@application, :scheduled)
+      get flight_control.application_jobs_url(@application, :scheduled)
       assert_response :ok
 
       assert_select "tr.job", /DummyJob\s+Enqueued less than 5 seconds ago\s+queue_1\s+in 3 minutes/
@@ -129,7 +129,7 @@ class MissionControl::Jobs::JobsControllerTest < ActionDispatch::IntegrationTest
 
     DummyJob.set(wait: 3.minutes).perform_later
 
-    get mission_control_jobs.application_jobs_url(@application, :scheduled)
+    get flight_control.application_jobs_url(@application, :scheduled)
     assert_response :ok
 
     assert_select "tr.job", /DummyJob\s+Enqueued less than 5 seconds ago\s+queue_1\s+in 3 minutes/
@@ -142,7 +142,7 @@ class MissionControl::Jobs::JobsControllerTest < ActionDispatch::IntegrationTest
     DummyReloadedJob.perform_later(42)
     perform_enqueued_jobs_async
 
-    get mission_control_jobs.application_jobs_url(@application, :finished, filter: { job_class_name: " \n\t \n\t" })
+    get flight_control.application_jobs_url(@application, :finished, filter: { job_class_name: " \n\t \n\t" })
     assert_response :ok
     assert_select "tr.job", 2
     assert_select "tr.job", /DummyJob/
@@ -154,7 +154,7 @@ class MissionControl::Jobs::JobsControllerTest < ActionDispatch::IntegrationTest
     DummyReloadedJob.perform_later(42)
     perform_enqueued_jobs_async
 
-    get mission_control_jobs.application_jobs_url(@application, :finished, filter: { job_class_name: " \n\tDummyJob \n\t" })
+    get flight_control.application_jobs_url(@application, :finished, filter: { job_class_name: " \n\tDummyJob \n\t" })
     assert_response :ok
     assert_select "tr.job", 1
     assert_select "tr.job", /DummyJob/
@@ -165,7 +165,7 @@ class MissionControl::Jobs::JobsControllerTest < ActionDispatch::IntegrationTest
     DummyReloadedJob.perform_later(42)
     perform_enqueued_jobs_async
 
-    get mission_control_jobs.application_jobs_url(@application, :finished, filter: { queue_name: " \n\tqueue_1 \n\t" })
+    get flight_control.application_jobs_url(@application, :finished, filter: { queue_name: " \n\tqueue_1 \n\t" })
     assert_response :ok
     assert_select "tr.job", 1
     assert_select "tr.job", /DummyJob/

@@ -1,0 +1,6 @@
+<% navigation(title: "Workers", section: :workers)  %>
+
+<%= render "flight_control/workers/workers_page", workers_page: @workers_page %>
+
+<%= render "flight_control/shared/pagination_toolbar", page: @workers_page, filter_param: {} %>
+

@@ -1,4 +1,4 @@
-MissionControl::Jobs::Engine.routes.draw do
+FlightControl::Engine.routes.draw do
   resources :applications, only: [] do
     resources :queues, only: [ :index, :show ] do
       scope module: :queues do

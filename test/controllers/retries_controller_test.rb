@@ -1,9 +1,9 @@
 require "test_helper"
 
-class MissionControl::Jobs::JobsControllerTest < ActionDispatch::IntegrationTest
+class FlightControl::JobsControllerTest < ActionDispatch::IntegrationTest
   test "retry job with invalid ID" do
-    post mission_control_jobs.application_job_retry_url(@application, "unknown_id")
-    assert_redirected_to mission_control_jobs.application_jobs_url(@application, :failed)
+    post flight_control.application_job_retry_url(@application, "unknown_id")
+    assert_redirected_to flight_control.application_jobs_url(@application, :failed)
     follow_redirect!
 
     assert_select "article.is-danger", /Job with id 'unknown_id' not found/
@@ -14,14 +14,14 @@ class MissionControl::Jobs::JobsControllerTest < ActionDispatch::IntegrationTest
 
     perform_enqueued_jobs_async
 
-    get mission_control_jobs.application_jobs_url(@application, :failed)
+    get flight_control.application_jobs_url(@application, :failed)
     assert_response :ok
 
     assert_select "tr.job", 1
     assert_select "tr.job", /AutoRetryingJob\s+Enqueued less than 5 seconds ago\s+AutoRetryingJob::RandomError/
 
-    post mission_control_jobs.application_job_retry_url(@application, job.job_id)
-    assert_redirected_to mission_control_jobs.application_jobs_url(@application, :failed)
+    post flight_control.application_job_retry_url(@application, job.job_id)
+    assert_redirected_to flight_control.application_jobs_url(@application, :failed)
     follow_redirect!
 
     assert_select "article.is-danger", text: /Job with id '#{job.job_id}' not found/, count: 0

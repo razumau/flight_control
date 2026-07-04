@@ -26,7 +26,7 @@ class ActiveSupport::TestCase
   include JobsHelper, JobQueuesHelper, ThreadHelper
 
   setup do
-    @original_applications = MissionControl::Jobs.applications
+    @original_applications = FlightControl.applications
     reset_executions_for_job_test_classes
     delete_adapters_data
     ActiveJob::Base.current_queue_adapter = nil
@@ -34,7 +34,7 @@ class ActiveSupport::TestCase
   end
 
   teardown do
-    MissionControl::Jobs.applications = @original_applications
+    FlightControl.applications = @original_applications
   end
 
   private
@@ -62,9 +62,9 @@ end
 class ActionDispatch::IntegrationTest
   # Integration tests just use Solid Queue for now
   setup do
-    MissionControl::Jobs.applications.add("integration-tests", { solid_queue: queue_adapter_for_test })
+    FlightControl.applications.add("integration-tests", { solid_queue: queue_adapter_for_test })
 
-    @application = MissionControl::Jobs.applications["integration-tests"]
+    @application = FlightControl.applications["integration-tests"]
     @server = @application.servers[:solid_queue]
     @worker = SolidQueue::Worker.new(queues: "*", threads: 2, polling_interval: 0.01)
 

@@ -2,11 +2,11 @@ require_relative "../application_system_test_case"
 
 class ChangeAppsAndServersTest < ApplicationSystemTestCase
   setup do
-    applications = MissionControl::Jobs::Applications.new
+    applications = FlightControl::Applications.new
     applications.add "Dummy", solid_queue: ActiveJob::QueueAdapters::SolidQueueAdapter.new
     applications.add "hey", solid_queue: ActiveJob::QueueAdapters::SolidQueueAdapter.new
     applications.add "bc4", us_east: ActiveJob::QueueAdapters::SolidQueueAdapter.new, us_west: ActiveJob::QueueAdapters::SolidQueueAdapter.new
-    MissionControl::Jobs.applications = applications
+    FlightControl.applications = applications
   end
 
   test "switch apps" do

@@ -5,7 +5,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
 
   include UIHelper
 
-  include MissionControl::Jobs::Engine.routes.url_helpers
+  include FlightControl::Engine.routes.url_helpers
 
   def run
     # Activate default job server so that setup data before any navigation

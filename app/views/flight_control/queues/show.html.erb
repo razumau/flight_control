@@ -1,0 +1,25 @@
+<% navigation(title: "Queue #{@queue.name}", section: :queues) %>
+
+<%= render "flight_control/queues/queue_title", queue: @queue %>
+
+<% if @jobs_page.empty? %>
+  <%= blank_status_notice "The queue is empty" %>
+<% else %>
+  <table class="jobs table queues is-hoverable is-fullwidth">
+    <tbody>
+    <thead>
+    <tr>
+      <th class="job-header">Job</th>
+      <th></th>
+    </tr>
+    </thead>
+
+    <%= render partial: "flight_control/queues/job", collection: @jobs_page.records %>
+
+    </tbody>
+  </table>
+
+  <%= render "flight_control/shared/pagination_toolbar", page: @jobs_page, filter_param: {} %>
+<% end %>
+
+

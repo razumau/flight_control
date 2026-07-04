@@ -1,6 +1,6 @@
 require "test_helper"
 
-class MissionControl::Jobs::WorkersControllerTest < ActionDispatch::IntegrationTest
+class FlightControl::WorkersControllerTest < ActionDispatch::IntegrationTest
   setup do
     2.times { PauseJob.perform_later }
     Socket.stubs(:gethostname).returns("my-hostname-123")
@@ -9,7 +9,7 @@ class MissionControl::Jobs::WorkersControllerTest < ActionDispatch::IntegrationT
   test "get workers" do
     perform_enqueued_jobs_async(wait: 0) do
       worker = @server.workers_relation.first
-      get mission_control_jobs.application_workers_url(@application)
+      get flight_control.application_workers_url(@application)
 
       assert_select "tr.worker", 1
       assert_select "tr.worker", /worker #{worker.id}\s+PID: \d+\s+my-hostname-123\s+PauseJob/
@@ -19,8 +19,8 @@ class MissionControl::Jobs::WorkersControllerTest < ActionDispatch::IntegrationT
   test "paginate workers" do
     register_workers(count: 6)
 
-    stub_const(MissionControl::Jobs::Page, :DEFAULT_PAGE_SIZE, 2) do
-      get mission_control_jobs.application_workers_url(@application)
+    stub_const(FlightControl::Page, :DEFAULT_PAGE_SIZE, 2) do
+      get flight_control.application_workers_url(@application)
       assert_response :ok
 
       assert_select "tr.worker", 2
@@ -32,7 +32,7 @@ class MissionControl::Jobs::WorkersControllerTest < ActionDispatch::IntegrationT
     perform_enqueued_jobs_async(wait: 0) do
       worker = @server.workers_relation.first
 
-      get mission_control_jobs.application_worker_url(@application, worker.id)
+      get flight_control.application_worker_url(@application, worker.id)
       assert_response :ok
 
       assert_select "h1", /Worker #{worker.id} — PID: \d+/

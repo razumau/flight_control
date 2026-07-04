@@ -1,9 +1,9 @@
 require "test_helper"
 
-class MissionControl::Jobs::RecurringTasksControllerTest < ActionDispatch::IntegrationTest
+class FlightControl::RecurringTasksControllerTest < ActionDispatch::IntegrationTest
   test "get recurring task list" do
     schedule_recurring_tasks_async(wait: 2.seconds) do
-      get mission_control_jobs.application_recurring_tasks_url(@application)
+      get flight_control.application_recurring_tasks_url(@application)
       assert_response :ok
 
       assert_select "tr.recurring_task", 1
@@ -16,7 +16,7 @@ class MissionControl::Jobs::RecurringTasksControllerTest < ActionDispatch::Integ
 
   test "get recurring task details and job list" do
     schedule_recurring_tasks_async(wait: 1.seconds) do
-      get mission_control_jobs.application_recurring_task_url(@application, "periodic_pause_job")
+      get flight_control.application_recurring_task_url(@application, "periodic_pause_job")
       assert_response :ok
       assert_select "h1", /periodic_pause_job/
       assert_select "h2", "1 job"
@@ -28,8 +28,8 @@ class MissionControl::Jobs::RecurringTasksControllerTest < ActionDispatch::Integ
 
   test "redirect to recurring tasks list when recurring task doesn't exist" do
     schedule_recurring_tasks_async do
-      get mission_control_jobs.application_recurring_task_url(@application, "invalid_key")
-      assert_redirected_to mission_control_jobs.application_recurring_tasks_url(@application)
+      get flight_control.application_recurring_task_url(@application, "invalid_key")
+      assert_redirected_to flight_control.application_recurring_tasks_url(@application)
 
       follow_redirect!
 

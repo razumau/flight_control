@@ -15,7 +15,7 @@ GIT
 PATH
   remote: .
   specs:
-    mission_control-jobs (1.1.0)
+    flight_control (1.1.0)
       actioncable (>= 7.1)
       actionpack (>= 7.1)
       activejob (>= 7.1)
@@ -266,7 +266,7 @@ DEPENDENCIES
   better_html
   capybara!
   debug
-  mission_control-jobs!
+  flight_control!
   mocha
   propshaft
   puma

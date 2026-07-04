@@ -1,5 +1,5 @@
 module ActiveJob::QueueAdapters::SolidQueueExt
-  include MissionControl::Jobs::Adapter
+  include FlightControl::Adapter
   include RecurringTasks, Workers
 
   def queues
@@ -112,7 +112,7 @@ module ActiveJob::QueueAdapters::SolidQueueExt
 
     def filter_raw_data_arguments(raw_data)
       raw_data.deep_dup.tap do |filtered_raw_data|
-        filtered_raw_data["arguments"]["arguments"] = MissionControl::Jobs.job_arguments_filter.apply_to(filtered_raw_data.dig("arguments", "arguments"))
+        filtered_raw_data["arguments"]["arguments"] = FlightControl.job_arguments_filter.apply_to(filtered_raw_data.dig("arguments", "arguments"))
       end
     end
 
@@ -224,7 +224,7 @@ module ActiveJob::QueueAdapters::SolidQueueExt
         end
 
         def internally_limited_count
-          count_limit = MissionControl::Jobs.internal_query_count_limit + 1
+          count_limit = FlightControl.internal_query_count_limit + 1
           limited_count = solid_queue_status.finished? ? finished_jobs.limit(count_limit).count : executions.limit(count_limit).count
           (limited_count == count_limit) ? Float::INFINITY : limited_count
         end

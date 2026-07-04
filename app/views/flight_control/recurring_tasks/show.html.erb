@@ -1,0 +1,14 @@
+<% navigation(title: @recurring_task.id, section: :recurring_tasks) %>
+
+<%= render "flight_control/recurring_tasks/title", recurring_task: @recurring_task %>
+<%= render "flight_control/recurring_tasks/general_information", recurring_task: @recurring_task %>
+
+<% if @jobs_page.empty? %>
+  <%= blank_status_notice "No jobs found for this recurring task" %>
+<% else %>
+  <h2 class="subtitle"><%= pluralize @recurring_task.jobs.count, "job" %></h2>
+
+  <%= render "flight_control/shared/jobs", jobs: @jobs_page.records %>
+
+  <%= render "flight_control/shared/pagination_toolbar", page: @jobs_page, filter_param: jobs_filter_param %>
+<% end %>

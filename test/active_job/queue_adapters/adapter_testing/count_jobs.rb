@@ -112,8 +112,8 @@ module ActiveJob::QueueAdapters::AdapterTesting::CountJobs
     skip "Only Solid Queue supports internal query count limit" unless queue_adapter == :solid_queue
 
     begin
-      original_limit = MissionControl::Jobs.internal_query_count_limit
-      MissionControl::Jobs.internal_query_count_limit = 5
+      original_limit = FlightControl.internal_query_count_limit
+      FlightControl.internal_query_count_limit = 5
       assert_equal 0, ActiveJob.jobs.pending.count
 
       5.times { DummyJob.perform_later }
@@ -122,7 +122,7 @@ module ActiveJob::QueueAdapters::AdapterTesting::CountJobs
       DummyJob.perform_later
       assert_equal Float::INFINITY, ActiveJob.jobs.pending.count
     ensure
-      MissionControl::Jobs.internal_query_count_limit = original_limit
+      FlightControl.internal_query_count_limit = original_limit
     end
   end
 end

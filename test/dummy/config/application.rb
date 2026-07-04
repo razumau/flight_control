@@ -8,7 +8,7 @@ require "solid_queue"
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
-require "mission_control/jobs"
+require "flight_control"
 
 
 module Dummy
@@ -26,7 +26,7 @@ module Dummy
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
 
-    # Mission Control configured adapters
-    config.mission_control.jobs.adapters = [ :solid_queue ]
+    # Flight Control configured adapters
+    config.flight_control.adapters = [ :solid_queue ]
   end
 end

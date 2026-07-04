@@ -20,7 +20,7 @@ class ShowFailedJobsTest < ApplicationSystemTestCase
     ActiveJob.jobs.failed.discard_all
     FailingPostJob.perform_later(Post.create(title: "hello_world"), 1.year.ago, author: "Jorge")
     perform_enqueued_jobs
-    @previous_filter_arguments, MissionControl::Jobs.filter_arguments = MissionControl::Jobs.filter_arguments, %w[ author ]
+    @previous_filter_arguments, FlightControl.filter_arguments = FlightControl.filter_arguments, %w[ author ]
 
     visit jobs_path(:failed)
     click_on "FailingPostJob"
@@ -29,7 +29,7 @@ class ShowFailedJobsTest < ApplicationSystemTestCase
     assert_text /\[FILTERED\]/
     assert_no_text /Jorge/
   ensure
-    MissionControl::Jobs.filter_arguments = @previous_filter_arguments
+    FlightControl.filter_arguments = @previous_filter_arguments
   end
 
   test "click on a failed job error to see its error information" do
@@ -58,16 +58,16 @@ class ShowFailedJobsTest < ApplicationSystemTestCase
   test "Does not offer Clean/Full buttons when a backtrace cleaner is not configured" do
     setup do
       # grab the current state
-      @backtrace_cleaner = MissionControl::Jobs.backtrace_cleaner
-      @applications = MissionControl::Jobs.backtrace_cleaner
+      @backtrace_cleaner = FlightControl.backtrace_cleaner
+      @applications = FlightControl.backtrace_cleaner
 
       # reset the state
-      MissionControl::Jobs.backtrace_cleaner = nil
-      MissionControl::Jobs.applications = Applications.new
+      FlightControl.backtrace_cleaner = nil
+      FlightControl.applications = Applications.new
 
       # Setup the application with what we had before *minus* a backtrace cleaner
       @applications.each do |application|
-        MissionControl::Jobs.applications.add(application.name).tap do |it|
+        FlightControl.applications.add(application.name).tap do |it|
           application.servers.each do |server|
             it.add_servers(server.name, server.queue_adapter)
           end
@@ -77,8 +77,8 @@ class ShowFailedJobsTest < ApplicationSystemTestCase
 
     teardown do
       # reset back to the known state before the start of the test
-      MissionControl::Jobs.backtrace_cleaner = @backtrace_cleaner
-      MissionControl::Jobs.applications = @application
+      FlightControl.backtrace_cleaner = @backtrace_cleaner
+      FlightControl.applications = @application
     end
 
     visit jobs_path(:failed)

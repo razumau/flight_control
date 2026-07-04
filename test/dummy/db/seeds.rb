@@ -117,7 +117,7 @@ BASE_COUNT = (ENV["COUNT"].presence || 100).to_i
 
 Post.find_or_create_by!(title: "Hello World!", body: "This is my first post.")
 
-MissionControl::Jobs.applications.each do |application|
+FlightControl.applications.each do |application|
   application.servers.each do |server|
     JobsLoader.new(application, server, failed_jobs_count: BASE_COUNT, pending_jobs_count: BASE_COUNT / 2).load
   end
