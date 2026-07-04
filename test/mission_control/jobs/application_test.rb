@@ -6,7 +6,7 @@ class MissionControl::Jobs::ApplicationTest < ActiveSupport::TestCase
   end
 
   test "register job servers" do
-    queue_adapter = ActiveJob::QueueAdapters::ResqueAdapter.new
+    queue_adapter = ActiveJob::QueueAdapters::SolidQueueAdapter.new
     @application.add_servers chicago: queue_adapter
 
     server = @application.servers.first
@@ -15,7 +15,7 @@ class MissionControl::Jobs::ApplicationTest < ActiveSupport::TestCase
   end
 
   test "find job servers by name or slug" do
-    queue_adapter = ActiveJob::QueueAdapters::ResqueAdapter.new
+    queue_adapter = ActiveJob::QueueAdapters::SolidQueueAdapter.new
     @application.add_servers "US east 1": queue_adapter
     assert_equal queue_adapter, @application.servers["us-east-1"].queue_adapter
   end

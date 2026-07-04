@@ -15,10 +15,10 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     end
   end
 
-  # UI tests just use Resque for now
   def perform_enqueued_jobs
-    worker = Resque::Worker.new("*")
-    worker.work(0.0)
+    worker = SolidQueue::Worker.new(queues: "*", threads: 1, polling_interval: 0.01)
+    worker.mode = :inline
+    worker.start
   end
 end
 

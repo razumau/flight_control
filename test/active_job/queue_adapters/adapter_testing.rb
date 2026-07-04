@@ -14,7 +14,7 @@ module ActiveJob::QueueAdapters::AdapterTesting
     #
     # Template method to override in child classes.
     #
-    # E.g: +:resque+, +:sidekiq+
+    # E.g: +:solid_queue+
     def queue_adapter
       raise NotImplementedError
     end

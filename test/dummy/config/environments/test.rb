@@ -47,7 +47,7 @@ Rails.application.configure do
 
   # Annotate rendered view with file names.
   # config.action_view.annotate_rendered_view_with_filenames = true
-  config.active_job.queue_adapter = :resque
+  config.active_job.queue_adapter = :solid_queue
 
   config.solid_queue.connects_to = { database: { writing: :queue } }
 

@@ -3,7 +3,6 @@ require_relative "boot"
 require "rails/all"
 require "propshaft"
 
-require "resque"
 require "solid_queue"
 
 # Require the gems listed in Gemfile, including any gems
@@ -28,6 +27,6 @@ module Dummy
     # config.eager_load_paths << Rails.root.join("extras")
 
     # Mission Control configured adapters
-    config.mission_control.jobs.adapters = [ :resque, :solid_queue, :async ]
+    config.mission_control.jobs.adapters = [ :solid_queue ]
   end
 end

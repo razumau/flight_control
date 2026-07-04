@@ -22,8 +22,6 @@ require_relative "active_job/queue_adapters/adapter_testing"
 Dir[File.join(__dir__, "support", "*.rb")].each { |file| require file }
 Dir[File.join(__dir__, "active_job", "queue_adapters", "adapter_testing", "*.rb")].each { |file| require file }
 
-ENV["FORK_PER_JOB"] = "false" # Disable forking when dispatching resque jobs
-
 class ActiveSupport::TestCase
   include JobsHelper, JobQueuesHelper, ThreadHelper
 
@@ -45,26 +43,15 @@ class ActiveSupport::TestCase
     end
 
     def delete_adapters_data
-      delete_resque_data
       delete_solid_queue_data
     end
 
     alias delete_all_jobs delete_adapters_data
 
-    def delete_resque_data
-      redis = root_resque_redis
-      all_keys = redis.keys("test*")
-      redis.del all_keys if all_keys.any?
-    end
-
     def delete_solid_queue_data
       SolidQueue::Job.find_each(&:destroy)
       SolidQueue::Process.find_each(&:destroy)
       SolidQueue::RecurringTask.find_each(&:destroy)
-    end
-
-    def root_resque_redis
-      @root_resque_redis ||= Redis.new(host: "localhost", port: 6379)
     end
 
     def reset_configured_queues_for_job_classes

@@ -1,19 +1,21 @@
 require_relative "../application_system_test_case"
 
 class ChangeAppsAndServersTest < ApplicationSystemTestCase
-  include ResqueHelper
+  setup do
+    applications = MissionControl::Jobs::Applications.new
+    applications.add "Dummy", solid_queue: ActiveJob::QueueAdapters::SolidQueueAdapter.new
+    applications.add "hey", solid_queue: ActiveJob::QueueAdapters::SolidQueueAdapter.new
+    applications.add "bc4", us_east: ActiveJob::QueueAdapters::SolidQueueAdapter.new, us_west: ActiveJob::QueueAdapters::SolidQueueAdapter.new
+    MissionControl::Jobs.applications = applications
+  end
 
   test "switch apps" do
-    within_job_server "hey" do
-      DummyJob.queue_as :hey_queue
-      10.times { |index| DummyJob.perform_later(index) }
-    end
+    DummyJob.queue_as :hey_queue
+    10.times { |index| DummyJob.perform_later(index) }
 
     visit queues_path
-    assert_empty job_row_elements
-
     hover_app_selector and_click: /hey/i
-    assert_equal 1, queue_row_elements.length
+    assert_selector ".application-selector .navbar-link", text: "hey"
 
     click_on "hey_queue"
     assert_equal 10, job_row_elements.length
@@ -21,27 +23,15 @@ class ChangeAppsAndServersTest < ApplicationSystemTestCase
 
   test "switch job servers" do
     DummyJob.queue_as :bc4_queue
-
-    within_job_server "bc4", server: "resque_ashburn" do
-      5.times { |index| DummyJob.perform_later(index) }
-    end
-
-    within_job_server "bc4", server: "resque_chicago" do
-      DummyJob.queue_as :bc4_queue_chicago
-      10.times { |index| DummyJob.perform_later(index) }
-    end
+    5.times { |index| DummyJob.perform_later(index) }
 
     visit queues_path
-    click_on "bc4_queue"
-    assert_equal 5, job_row_elements.length
+    hover_app_selector and_click: /bc4/i
+    assert_selector ".server-selector li.is-active", text: "us_east"
 
-    click_on_server_selector "resque_chicago"
-    assert_text 10
-    click_on "bc4_queue"
-    assert_equal 10, job_row_elements.length
+    click_on_server_selector "us_west"
+    assert_selector ".server-selector li.is-active", text: "us_west"
 
-    click_on_server_selector "resque_ashburn"
-    assert_text 5
     click_on "bc4_queue"
     assert_equal 5, job_row_elements.length
   end

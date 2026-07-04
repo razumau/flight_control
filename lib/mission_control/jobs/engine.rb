@@ -30,7 +30,13 @@ module MissionControl
         end
 
         if MissionControl::Jobs.adapters.empty?
-          MissionControl::Jobs.adapters << (config.active_job.queue_adapter || :async)
+          MissionControl::Jobs.adapters << (config.active_job.queue_adapter || :solid_queue)
+        end
+
+        unless MissionControl::Jobs.adapters.all? { |adapter| adapter.to_sym == :solid_queue }
+          unsupported = MissionControl::Jobs.adapters.reject { |adapter| adapter.to_sym == :solid_queue }
+          raise MissionControl::Jobs::Errors::UnsupportedAdapter,
+            "Flight Control only supports Solid Queue, but the following adapters are configured: #{unsupported.join(", ")}"
         end
       end
 
@@ -49,17 +55,7 @@ module MissionControl
       end
 
       config.before_initialize do
-        if MissionControl::Jobs.adapters.include?(:resque)
-          require "resque/thread_safe_redis"
-          ActiveJob::QueueAdapters::ResqueAdapter.prepend ActiveJob::QueueAdapters::ResqueExt
-          Resque.prepend Resque::ThreadSafeRedis
-        end
-
-        if MissionControl::Jobs.adapters.include?(:solid_queue)
-          ActiveJob::QueueAdapters::SolidQueueAdapter.prepend ActiveJob::QueueAdapters::SolidQueueExt
-        end
-
-        ActiveJob::QueueAdapters::AsyncAdapter.include ActiveJob::QueueAdapters::AsyncExt
+        ActiveJob::QueueAdapters::SolidQueueAdapter.prepend ActiveJob::QueueAdapters::SolidQueueExt
       end
 
       config.after_initialize do |app|

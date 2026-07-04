@@ -1,8 +1,3 @@
-def clean_redis
-  all_keys = Resque.redis.keys("*")
-  Resque.redis.del all_keys if all_keys.any?
-end
-
 def clean_database
   SolidQueue::Job.all.each(&:destroy)
   SolidQueue::Process.all.each(&:destroy)
@@ -87,27 +82,14 @@ class JobsLoader
     end
 
     def perform_jobs
-      case server.queue_adapter_name
-      when :resque
-        worker = Resque::Worker.new("*")
-        worker.work(0.0)
-      when :solid_queue
-        worker = SolidQueue::Worker.new(queues: "*", threads: 1, polling_interval: 0.01)
-        worker.mode = :inline
-        worker.start
-      else
-        raise "Don't know how to dispatch jobs for #{server.queue_adapter_name} adapter"
-      end
+      worker = SolidQueue::Worker.new(queues: "*", threads: 1, polling_interval: 0.01)
+      worker.mode = :inline
+      worker.start
     end
 
     def create_recurring_tasks
-      case server.queue_adapter_name
-      when :solid_queue
-        SolidQueue::RecurringTask.from_configuration(:dummy_hourly, class: "DummyJob", args: [ 1000 ], schedule: "every hour").save!
-        SolidQueue::RecurringTask.from_configuration(:post_daily, command: "Post.create!(title: 'Hey')", schedule: "at 5am every day").save!
-      else
-        raise "Don't know how to dispatch recurring tasks for #{server.queue_adapter_name} adapter"
-      end
+      SolidQueue::RecurringTask.from_configuration(:dummy_hourly, class: "DummyJob", args: [ 1000 ], schedule: "every hour").save!
+      SolidQueue::RecurringTask.from_configuration(:post_daily, command: "Post.create!(title: 'Hey')", schedule: "at 5am every day").save!
     end
 
     def with_random_queue(job_class)
@@ -129,7 +111,6 @@ class JobsLoader
 end
 
 puts "Deleting existing jobs..."
-clean_redis
 clean_database
 
 BASE_COUNT = (ENV["COUNT"].presence || 100).to_i

@@ -8,6 +8,10 @@ class MissionControl::Jobs::Server
 
   def initialize(name:, queue_adapter:, application:, backtrace_cleaner: nil)
     super(name: name)
+    unless queue_adapter.is_a?(ActiveJob::QueueAdapters::SolidQueueAdapter)
+      raise MissionControl::Jobs::Errors::UnsupportedAdapter,
+        "Flight Control only supports Solid Queue, can't register server #{name} with #{queue_adapter.class}"
+    end
     @queue_adapter = queue_adapter
     @application = application
     @backtrace_cleaner = backtrace_cleaner || MissionControl::Jobs.backtrace_cleaner

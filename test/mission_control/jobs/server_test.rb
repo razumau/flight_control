@@ -2,13 +2,13 @@ require "test_helper"
 
 class MissionControl::Jobs::ServerTest < ActiveSupport::TestCase
   setup do
-    @application = MissionControl::Jobs.applications[:bc4]
+    @application = MissionControl::Jobs.applications.first
   end
 
   test "activating a queue adapter" do
     current_adapter = ActiveJob::Base.queue_adapter
-    new_adapter = ActiveJob::QueueAdapters::ResqueAdapter.new
-    server = MissionControl::Jobs::Server.new(name: "resque_chicago", queue_adapter: new_adapter, application: @application)
+    new_adapter = ActiveJob::QueueAdapters::SolidQueueAdapter.new
+    server = MissionControl::Jobs::Server.new(name: "secondary", queue_adapter: new_adapter, application: @application)
 
     assert_equal current_adapter, ActiveJob::Base.queue_adapter
 
@@ -19,5 +19,11 @@ class MissionControl::Jobs::ServerTest < ActiveSupport::TestCase
 
     assert @executed
     assert_equal current_adapter, ActiveJob::Base.queue_adapter
+  end
+
+  test "registering a server with a non-Solid Queue adapter raises an error" do
+    assert_raises MissionControl::Jobs::Errors::UnsupportedAdapter do
+      MissionControl::Jobs::Server.new(name: "async", queue_adapter: ActiveJob::QueueAdapters::AsyncAdapter.new, application: @application)
+    end
   end
 end
