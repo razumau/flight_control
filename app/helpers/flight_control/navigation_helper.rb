@@ -9,6 +9,7 @@ module FlightControl::NavigationHelper
 
       sections[:workers] = [ "Workers", application_workers_path(@application) ] if workers_exposed?
       sections[:recurring_tasks] = [ "Recurring tasks", application_recurring_tasks_path(@application) ] if recurring_tasks_supported?
+      sections[:job_launches] = [ "Run job", new_application_job_launch_path(@application) ]
     end
   end
 

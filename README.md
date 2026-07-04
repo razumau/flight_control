@@ -141,6 +141,18 @@ When you have multiple apps and servers configured, you can choose between them 
 
 Besides inspecting the queues and the jobs in them, and discarding and retrying failed jobs, you can inspect jobs in different statuses, filter them by _queue name_ and _job class name_, pause and un-pause queues, inspect workers, know which jobs are being run by what worker, check a specific job or a specific worker, and manage recurring tasks.
 
+Job lists are sorted newest first: the most recently enqueued (or finished) jobs appear at the top. Scheduled jobs are the exception; they're listed in the order they will run.
+
+### Running jobs from the UI
+
+The **Run job** tab lets you enqueue any job class defined in your application. Pick the job class, provide its arguments as a JSON array, and optionally override the queue. A trailing JSON object is passed to the job as keyword arguments; for example, for a job defined as `def perform(post_id, notify: false)` you'd enter:
+
+```json
+[ 123, { "notify": true } ]
+```
+
+Arguments must be expressible as JSON, so jobs that take records or other rich objects as arguments can't be launched this way.
+
 ![Default queue tab](docs/images/default-queue.png)
 
 ![In-progress jobs tab](docs/images/in-progress-jobs.png)

@@ -1,0 +1,53 @@
+<% navigation(title: "Run job", section: :job_launches) %>
+
+<%= form_with model: @job_launch, url: application_job_launches_path(@application) do |form| %>
+  <% if @job_launch.errors.any? %>
+    <article class="message is-danger">
+      <div class="message-body">
+        <ul>
+          <% @job_launch.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    </article>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :job_class_name, "Job class", class: "label" %>
+    <div class="control">
+      <div class="select">
+        <%= form.select :job_class_name, @job_classes.map(&:name), include_blank: "Select a job class..." %>
+      </div>
+    </div>
+  </div>
+
+  <div class="field">
+    <%= form.label :arguments_json, "Arguments", class: "label" %>
+    <div class="control">
+      <%= form.text_area :arguments_json, class: "textarea is-family-monospace", rows: 4, placeholder: '[ 123, "abc", { "some_option": true } ]' %>
+    </div>
+    <p class="help">
+      A JSON array with the job's arguments. A trailing JSON object is passed as keyword arguments.
+      Leave <code>[]</code> to run the job without arguments.
+    </p>
+  </div>
+
+  <div class="field">
+    <%= form.label :queue_name, "Queue (optional)", class: "label" %>
+    <div class="control">
+      <%= form.text_field :queue_name, class: "input", list: "queue-names", placeholder: "Job class default", autocomplete: "off" %>
+    </div>
+    <datalist id="queue-names" class="is-hidden">
+      <% @queue_names.each do |queue_name| %>
+        <option value="<%= queue_name %>"></option>
+      <% end %>
+    </datalist>
+  </div>
+
+  <div class="field">
+    <div class="control">
+      <%= form.submit "Enqueue job", class: "button is-primary" %>
+    </div>
+  </div>
+<% end %>

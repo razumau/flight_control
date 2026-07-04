@@ -21,6 +21,7 @@ FlightControl::Engine.routes.draw do
 
     resources :workers, only: [ :index, :show ]
     resources :recurring_tasks, only: [ :index, :show, :update ]
+    resources :job_launches, only: [ :new, :create ]
   end
 
   # Allow referencing urls without providing an application_id. It will default to the first one.
