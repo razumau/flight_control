@@ -44,8 +44,8 @@ module ActiveJob::QueueAdapters::AdapterTesting::QueryJobs
 
     jobs = ActiveJob.jobs.failed.limit(2).to_a
     assert_equal 2, jobs.size
-    assert_equal [ 0 ], jobs[0].serialized_arguments
-    assert_equal [ 1 ], jobs[1].serialized_arguments
+    assert_equal [ 9 ], jobs[0].serialized_arguments
+    assert_equal [ 8 ], jobs[1].serialized_arguments
   end
 
   test "enumerate jobs with offset without limit" do
@@ -54,8 +54,8 @@ module ActiveJob::QueueAdapters::AdapterTesting::QueryJobs
 
     jobs = ActiveJob.jobs.failed.offset(2).to_a
     assert_equal 8, jobs.size
-    assert_equal [ 2 ], jobs[0].serialized_arguments
-    assert_equal [ 9 ], jobs[7].serialized_arguments
+    assert_equal [ 7 ], jobs[0].serialized_arguments
+    assert_equal [ 0 ], jobs[7].serialized_arguments
   end
 
   test "enumerate jobs with offset and limit" do
@@ -64,8 +64,8 @@ module ActiveJob::QueueAdapters::AdapterTesting::QueryJobs
 
     jobs = ActiveJob.jobs.failed.offset(2).limit(2).to_a
     assert_equal 2, jobs.size
-    assert_equal [ 2 ], jobs[0].serialized_arguments
-    assert_equal [ 3 ], jobs[1].serialized_arguments
+    assert_equal [ 7 ], jobs[0].serialized_arguments
+    assert_equal [ 6 ], jobs[1].serialized_arguments
   end
 
   test "enumerate jobs when limit is greater than the available set" do
@@ -104,8 +104,8 @@ module ActiveJob::QueueAdapters::AdapterTesting::QueryJobs
     jobs = WithPaginationFailingJob.jobs.failed.offset(2).limit(3).to_a
     assert_equal 3, jobs.size
 
-    assert_equal [ 2 ], jobs[0].serialized_arguments
-    assert_equal [ 4 ], jobs[2].serialized_arguments
+    assert_equal [ 7 ], jobs[0].serialized_arguments
+    assert_equal [ 5 ], jobs[2].serialized_arguments
   end
 
   test "fetch pending jobs when pagination kicks in and the first pages are empty due to filtering" do
@@ -132,6 +132,6 @@ module ActiveJob::QueueAdapters::AdapterTesting::QueryJobs
     2.times { DummyJob.perform_later }
     15.times { DummyReloadedJob.perform_later }
 
-    assert_equal [ "DummyJob", "DummyReloadedJob" ], ActiveJob.queues[:default].jobs.pending.job_class_names
+    assert_equal [ "DummyReloadedJob", "DummyJob" ], ActiveJob.queues[:default].jobs.pending.job_class_names
   end
 end

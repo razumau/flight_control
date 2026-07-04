@@ -9,13 +9,13 @@ class PaginateJobsTest < ApplicationSystemTestCase
   end
 
   test "paginate failed jobs" do
-    assert_jobs 0..9
+    assert_jobs 19.downto(10)
 
     click_on "Next page"
-    assert_jobs 10..19
+    assert_jobs 9.downto(0)
 
     click_on "Previous page"
-    assert_jobs 0..9
+    assert_jobs 19.downto(10)
   end
 
   private
