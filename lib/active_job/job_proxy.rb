@@ -27,7 +27,8 @@ class ActiveJob::JobProxy < ActiveJob::Base
   end
 
   def duration
-    finished_at - scheduled_at
+    ended_at = finished_at || failed_at
+    ended_at - scheduled_at if ended_at && scheduled_at
   end
 
   ActiveJob::JobsRelation::STATUSES.each do |status|

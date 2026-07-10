@@ -2,6 +2,7 @@
   <%= link_to failed_job_error(job), application_job_path(@application, job.job_id, anchor: "error") %>
   <div class="has-text-grey"><%= time_distance_in_words_with_title(job.failed_at) %> ago</div>
 </td>
+<td><div class="has-text-grey"><%= job_duration(job) %></div></td>
 <td class="pr-0">
   <%= render "flight_control/jobs/failed/actions", job: job %>
 </td>
