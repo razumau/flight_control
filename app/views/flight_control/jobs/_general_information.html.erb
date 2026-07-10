@@ -23,7 +23,7 @@
   <tr>
     <th>Enqueued</th>
     <td>
-      <%= time_distance_in_words_with_title(job.enqueued_at.to_datetime) %> ago
+      <%= timestamp_with_relative_time(job.enqueued_at.to_datetime) %>
     </td>
   </tr>
   <% if job.scheduled? %>
@@ -49,7 +49,7 @@
     <tr>
       <th>Finished</th>
       <td>
-        <%= time_distance_in_words_with_title(job.finished_at) %> ago
+        <%= timestamp_with_relative_time(job.finished_at) %>
       </td>
     </tr>
     <tr>

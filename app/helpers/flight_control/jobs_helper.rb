@@ -23,11 +23,16 @@ module FlightControl::JobsHelper
     end
   end
 
+  def job_duration(job)
+    return unless (seconds = job.duration)
+    tag.span formatted_duration(seconds), title: "#{seconds.round(3)} seconds"
+  end
+
   def attribute_names_for_job_status(status)
     case status.to_s
-    when "failed"      then [ "Error", "" ]
+    when "failed"      then [ "Error", "Duration", "" ]
     when "blocked"     then [ "Queue", "Blocked by", "" ]
-    when "finished"    then [ "Queue", "Finished" ]
+    when "finished"    then [ "Queue", "Duration", "Finished" ]
     when "scheduled"   then [ "Queue", "Scheduled", "" ]
     when "in_progress" then [ "Queue", "Run by", "Running for" ]
     else               []
@@ -39,6 +44,19 @@ module FlightControl::JobsHelper
   end
 
   private
+    DURATION_UNIT_ABBREVIATIONS = { years: "y", months: "mo", weeks: "w", days: "d", hours: "h", minutes: "m", seconds: "s" }
+
+    def formatted_duration(seconds)
+      if seconds < 1
+        "#{(seconds * 1000).round} ms"
+      elsif seconds < 60
+        "#{seconds.round(1)} s"
+      else
+        ActiveSupport::Duration.build(seconds.round).parts
+          .map { |unit, value| "#{value}#{DURATION_UNIT_ABBREVIATIONS[unit]}" }.join(" ")
+      end
+    end
+
     def renderable_job_arguments_for(job)
       job.serialized_arguments.collect do |argument|
         as_renderable_argument(argument)
