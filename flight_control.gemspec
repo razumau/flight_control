@@ -17,7 +17,7 @@ Gem::Specification.new do |spec|
     Dir["{lib}/**/*", "MIT-LICENSE", "Rakefile", "README.md", "CHANGELOG.md"]
   end
 
-  rails_version = ">= 7.1"
+  rails_version = ">= 8.1"
   spec.add_dependency "activerecord", rails_version
   spec.add_dependency "activejob", rails_version
   spec.add_dependency "actionpack", rails_version
@@ -29,6 +29,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "irb", "~> 1.13"
   spec.add_dependency "solid_queue", ">= 1.0"
 
+  spec.add_development_dependency "minitest", "~> 6.0"
   spec.add_development_dependency "selenium-webdriver"
   spec.add_development_dependency "mocha"
   spec.add_development_dependency "debug"

@@ -88,6 +88,7 @@ class ActionDispatch::IntegrationTest
 
     def perform_enqueued_jobs_async(wait: 1.second)
       @worker.start
+      wait_until_registered(@worker)
       sleep(wait)
 
       yield if block_given?
@@ -96,6 +97,7 @@ class ActionDispatch::IntegrationTest
 
     def schedule_recurring_tasks_async(wait: 1.second)
       @scheduler.start
+      wait_until_registered(@scheduler)
       sleep(wait)
 
       yield if block_given?
