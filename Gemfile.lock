@@ -15,7 +15,7 @@ GIT
 PATH
   remote: .
   specs:
-    flight_control (1.1.0)
+    flight_control (2.0.0.beta.1)
       actioncable (>= 8.1)
       actionpack (>= 8.1)
       activejob (>= 8.1)

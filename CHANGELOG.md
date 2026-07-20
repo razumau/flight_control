@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-07-20
+
 - Drops support for Resque and Async adapters to focus on Solid Queue.
 - Drops support for Rails versions below 8.1.
 - Lists newest jobs first on all pages.
