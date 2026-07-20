@@ -1,0 +1,28 @@
+name: Publish to RubyGems.org
+on:
+  push:
+    branches: main
+    paths: lib/flight_control/version.rb
+  workflow_dispatch:
+
+jobs:
+  push:
+    name: Push gem to RubyGems.org
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: false
+          ruby-version: ruby
+      - name: Install dependencies
+        run: bundle install
+      - uses: rubygems/release-gem@v1
