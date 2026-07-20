@@ -29,12 +29,13 @@ module ActiveJob::Executing
   end
 
   private
-    def jobs_relation_for_discarding
-      case status
-      when :failed  then ActiveJob.jobs.failed
-      when :pending then ActiveJob.jobs.pending.where(queue_name: queue_name)
-      else
-        ActiveJob.jobs
-      end
+
+  def jobs_relation_for_discarding
+    case status
+    when :failed then ActiveJob.jobs.failed
+    when :pending then ActiveJob.jobs.pending.where(queue_name: queue_name)
+    else
+      ActiveJob.jobs
     end
+  end
 end

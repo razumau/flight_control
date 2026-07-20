@@ -23,7 +23,7 @@ class DiscardJobsTest < ApplicationSystemTestCase
 
   test "discard a single job" do
     assert_equal 9, job_row_elements.length
-    expected_job_id = ActiveJob.jobs.failed.detect { |job| job.serialized_arguments == [ "failing-arg-2" ] }.job_id
+    expected_job_id = ActiveJob.jobs.failed.detect { |job| job.serialized_arguments == ["failing-arg-2"] }.job_id
 
     within_job_row "failing-arg-2" do
       accept_confirm do
@@ -40,13 +40,13 @@ class DiscardJobsTest < ApplicationSystemTestCase
     assert_equal 9, job_row_elements.length
 
     fill_in "filter[job_class_name]", with: "FailingReloadedJob"
-    assert_text /3 jobs found/i
+    assert_text(/3 jobs found/i)
 
     accept_confirm do
       click_on "Discard selection"
     end
 
-    assert_text /discarded 3 jobs/i
+    assert_text(/discarded 3 jobs/i)
     assert_equal 6, job_row_elements.length
   end
 
@@ -54,13 +54,13 @@ class DiscardJobsTest < ApplicationSystemTestCase
     assert_equal 9, job_row_elements.length
 
     fill_in "filter[queue_name]", with: "queue_2"
-    assert_text /5 jobs found/i
+    assert_text(/5 jobs found/i)
 
     accept_confirm do
       click_on "Discard selection"
     end
 
-    assert_text /discarded 5 jobs/i
+    assert_text(/discarded 5 jobs/i)
     assert_equal 4, job_row_elements.length
   end
 

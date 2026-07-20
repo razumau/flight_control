@@ -12,10 +12,10 @@ module FlightControl::InterfaceHelper
 
   def modifier_for_status(status)
     case status.to_s
-    when "failed"      then "is-danger"
-    when "blocked"     then "is-warning"
-    when "finished"    then "is-success"
-    when "scheduled"   then "is-info"
+    when "failed" then "is-danger"
+    when "blocked" then "is-warning"
+    when "finished" then "is-success"
+    when "scheduled" then "is-info"
     when "in_progress" then "is-primary"
     else "is-primary is-light"
     end

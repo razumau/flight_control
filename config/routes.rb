@@ -1,8 +1,8 @@
 FlightControl::Engine.routes.draw do
   resources :applications, only: [] do
-    resources :queues, only: [ :index, :show ] do
+    resources :queues, only: [:index, :show] do
       scope module: :queues do
-        resource :pause, only: [ :create, :destroy ]
+        resource :pause, only: [:create, :destroy]
       end
     end
 
@@ -19,13 +19,13 @@ FlightControl::Engine.routes.draw do
 
     resources :jobs, only: :index, path: ":status/jobs"
 
-    resources :workers, only: [ :index, :show ]
-    resources :recurring_tasks, only: [ :index, :show, :update ]
-    resources :job_launches, only: [ :new, :create ]
+    resources :workers, only: [:index, :show]
+    resources :recurring_tasks, only: [:index, :show, :update]
+    resources :job_launches, only: [:new, :create]
   end
 
   # Allow referencing urls without providing an application_id. It will default to the first one.
-  resources :queues, only: [ :index, :show ]
+  resources :queues, only: [:index, :show]
 
   resources :jobs, only: :show
   resources :jobs, only: :index, path: ":status/jobs"

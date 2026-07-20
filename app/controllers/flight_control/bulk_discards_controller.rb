@@ -9,12 +9,13 @@ class FlightControl::BulkDiscardsController < FlightControl::ApplicationControll
   end
 
   private
-    def jobs_to_discard
-      if active_filters?
-        bulk_limited_filtered_failed_jobs
-      else
-        # we don't want to apply any limit since "discarding all" without parameters can be optimized in the adapter as a much faster operation
-        ActiveJob.jobs.failed
-      end
+
+  def jobs_to_discard
+    if active_filters?
+      bulk_limited_filtered_failed_jobs
+    else
+      # we don't want to apply any limit since "discarding all" without parameters can be optimized in the adapter as a much faster operation
+      ActiveJob.jobs.failed
     end
+  end
 end

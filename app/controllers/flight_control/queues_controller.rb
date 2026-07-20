@@ -10,7 +10,8 @@ class FlightControl::QueuesController < FlightControl::ApplicationController
   end
 
   private
-    def set_queue
-      @queue = ActiveJob.queues[params[:id]]
-    end
+
+  def set_queue
+    @queue = ActiveJob.queues[params[:id]]
+  end
 end

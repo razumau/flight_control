@@ -29,5 +29,6 @@ class ActiveJob::Queues
   end
 
   private
-    attr_reader :queues_by_id
+
+  attr_reader :queues_by_id
 end

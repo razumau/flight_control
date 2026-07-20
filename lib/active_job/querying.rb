@@ -20,11 +20,12 @@ module ActiveJob::Querying
     end
 
     private
-      def fetch_queues
-        queue_adapter.queues.collect do |queue|
-          ActiveJob::Queue.new(queue[:name], size: queue[:size], active: queue[:active], queue_adapter: queue_adapter)
-        end
+
+    def fetch_queues
+      queue_adapter.queues.collect do |queue|
+        ActiveJob::Queue.new(queue[:name], size: queue[:size], active: queue[:active], queue_adapter: queue_adapter)
       end
+    end
   end
 
   def queue

@@ -13,7 +13,7 @@ class ListFailedJobsTest < ApplicationSystemTestCase
     job_row_elements.each.with_index do |job_element, index|
       within job_element do
         assert_text "FailingJob"
-        assert_text "#{9 - index}"
+        assert_text (9 - index).to_s
       end
     end
   end

@@ -45,8 +45,8 @@ module ActiveJob::QueueAdapters::AdapterTesting::RetryJobs
 
     assert_equal 7, ActiveJob.jobs.failed.count
 
-    [ 9, 8, 4, 3, 2, 1, 0 ].each.with_index do |expected_argument, index|
-      assert_equal [ expected_argument ], ActiveJob.jobs.failed[index].serialized_arguments
+    [9, 8, 4, 3, 2, 1, 0].each.with_index do |expected_argument, index|
+      assert_equal [expected_argument], ActiveJob.jobs.failed[index].serialized_arguments
     end
   end
 
@@ -118,8 +118,8 @@ module ActiveJob::QueueAdapters::AdapterTesting::RetryJobs
   end
 
   test "retrying a single job with filtered arguments preserves the original arguments" do
-    @previous_filter_arguments, FlightControl.filter_arguments = FlightControl.filter_arguments, %w[ author ]
-    arguments = [ Post.create(title: "hello_world"), 1.year.ago, { author: "Jorge", price: 10 } ]
+    @previous_filter_arguments, FlightControl.filter_arguments = FlightControl.filter_arguments, %w[author]
+    arguments = [Post.create(title: "hello_world"), 1.year.ago, {author: "Jorge", price: 10}]
     FailingPostJob.perform_later(arguments)
     perform_enqueued_jobs
 

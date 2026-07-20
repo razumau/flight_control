@@ -7,7 +7,8 @@ class FlightControl::RetriesController < FlightControl::ApplicationController
   end
 
   private
-    def jobs_relation
-      ActiveJob.jobs.failed
-    end
+
+  def jobs_relation
+    ActiveJob.jobs.failed
+  end
 end

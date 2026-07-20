@@ -15,7 +15,7 @@ class ListQueueJobsTest < ApplicationSystemTestCase
     job_row_elements.each.with_index do |job_element, index|
       within job_element do
         assert_text "DummyJob"
-        assert_text "#{9 - index}"
+        assert_text (9 - index).to_s
       end
     end
   end
@@ -23,6 +23,6 @@ class ListQueueJobsTest < ApplicationSystemTestCase
   test "show empty notice when no jobs" do
     perform_enqueued_jobs
     click_on "queue_1"
-    assert_text /queue is empty/i
+    assert_text(/queue is empty/i)
   end
 end

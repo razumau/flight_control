@@ -15,25 +15,26 @@ class FlightControl::JobsController < FlightControl::ApplicationController
   end
 
   private
-    def jobs_relation
-      filtered_jobs
-    end
 
-    def filtered_jobs_with_status
-      filtered_jobs.with_status(jobs_status)
-    end
+  def jobs_relation
+    filtered_jobs
+  end
 
-    def jobs_with_status
-      ActiveJob.jobs.with_status(jobs_status)
-    end
+  def filtered_jobs_with_status
+    filtered_jobs.with_status(jobs_status)
+  end
 
-    def filtered_jobs
-      ActiveJob.jobs.where(**@job_filters)
-    end
+  def jobs_with_status
+    ActiveJob.jobs.with_status(jobs_status)
+  end
 
-    helper_method :jobs_status
+  def filtered_jobs
+    ActiveJob.jobs.where(**@job_filters)
+  end
 
-    def jobs_status
-      params[:status].presence&.inquiry
-    end
+  helper_method :jobs_status
+
+  def jobs_status
+    params[:status].presence&.inquiry
+  end
 end

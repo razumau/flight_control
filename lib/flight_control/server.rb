@@ -2,7 +2,9 @@ require "active_job/queue_adapter"
 
 class FlightControl::Server
   include FlightControl::IdentifiedByName
-  include Serializable, RecurringTasks, Workers
+  include Workers
+  include RecurringTasks
+  include Serializable
 
   attr_reader :name, :queue_adapter, :application, :backtrace_cleaner
 

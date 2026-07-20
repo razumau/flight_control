@@ -75,7 +75,7 @@ module FlightControl
       IRB::Context.prepend(FlightControl::Console::Context)
 
       FlightControl.delay_between_bulk_operation_batches = 2
-      FlightControl.logger = ActiveSupport::Logger.new(STDOUT)
+      FlightControl.logger = ActiveSupport::Logger.new($stdout)
 
       if FlightControl.show_console_help
         puts "\n\nType 'jobs_help' to see how to connect to the available job servers to manage jobs\n\n"
@@ -85,7 +85,7 @@ module FlightControl
     initializer "flight_control.assets" do |app|
       app.config.assets.paths << root.join("app/assets/stylesheets")
       app.config.assets.paths << root.join("app/javascript")
-      app.config.assets.precompile += %w[ flight_control_manifest ]
+      app.config.assets.precompile += %w[flight_control_manifest]
     end
 
     initializer "flight_control.importmap", after: "importmap" do |app|

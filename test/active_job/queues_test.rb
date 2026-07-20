@@ -12,7 +12,7 @@ class ActiveJob::QueuesTest < ActiveSupport::TestCase
   test "direct access by name" do
     queue_1 = create_queue "queue_1"
     queue_2 = create_queue "queue_2"
-    queues = ActiveJob::Queues.new([ queue_1, queue_2 ])
+    queues = ActiveJob::Queues.new([queue_1, queue_2])
 
     assert_equal queue_1, queues[:queue_1]
     assert_equal queue_2, queues["queue_2"]
@@ -20,7 +20,7 @@ class ActiveJob::QueuesTest < ActiveSupport::TestCase
 
   test "direct access by name with special characters parameterized" do
     queue = ActiveJob::Queue.new("My-Queue_With.Special@Chars! and spaces")
-    queues = ActiveJob::Queues.new([ queue ])
+    queues = ActiveJob::Queues.new([queue])
 
     # Look-up queue by original name
     assert_equal queue, queues["My-Queue_With.Special@Chars! and spaces"]
@@ -31,14 +31,15 @@ class ActiveJob::QueuesTest < ActiveSupport::TestCase
   test "convert to hash" do
     queue_1 = create_queue "queue_1"
     queue_2 = create_queue "queue_2"
-    queues = ActiveJob::Queues.new([ queue_1, queue_2 ])
+    queues = ActiveJob::Queues.new([queue_1, queue_2])
 
-    expected_hash = { "queue_1" => queue_1, "queue_2" => queue_2 }
+    expected_hash = {"queue_1" => queue_1, "queue_2" => queue_2}
     assert_equal expected_hash, queues.to_h
   end
 
   private
-    def create_queue(name)
-      ActiveJob::Queue.new(name)
-    end
+
+  def create_queue(name)
+    ActiveJob::Queue.new(name)
+  end
 end

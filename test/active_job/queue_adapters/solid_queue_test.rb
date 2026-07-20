@@ -9,13 +9,14 @@ class ActiveJob::QueueAdapters::SolidQueueTest < ActiveSupport::TestCase
   end
 
   private
-    def queue_adapter
-      :solid_queue
-    end
 
-    def perform_enqueued_jobs
-      worker = SolidQueue::Worker.new(queues: "*", threads: 1, polling_interval: 0.01)
-      worker.mode = :inline
-      worker.start
-    end
+  def queue_adapter
+    :solid_queue
+  end
+
+  def perform_enqueued_jobs
+    worker = SolidQueue::Worker.new(queues: "*", threads: 1, polling_interval: 0.01)
+    worker.mode = :inline
+    worker.start
+  end
 end

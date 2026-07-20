@@ -8,42 +8,42 @@ class ShowFailedJobsTest < ApplicationSystemTestCase
   end
 
   test "click on a failed job to see its details" do
-    within_job_row /FailingJob\s*2/ do
+    within_job_row(/FailingJob\s*2/) do
       click_on "FailingJob"
     end
 
-    assert_text /arguments\s*2/i
-    assert_text /failing_job.rb/
+    assert_text(/arguments\s*2/i)
+    assert_text(/failing_job.rb/)
   end
 
   test "filtered arguments are hidden" do
     ActiveJob.jobs.failed.discard_all
     FailingPostJob.perform_later(Post.create(title: "hello_world"), 1.year.ago, author: "Jorge")
     perform_enqueued_jobs
-    @previous_filter_arguments, FlightControl.filter_arguments = FlightControl.filter_arguments, %w[ author ]
+    @previous_filter_arguments, FlightControl.filter_arguments = FlightControl.filter_arguments, %w[author]
 
     visit jobs_path(:failed)
     click_on "FailingPostJob"
 
-    assert_text /dummy\/post/i
-    assert_text /\[FILTERED\]/
-    assert_no_text /Jorge/
+    assert_text(/dummy\/post/i)
+    assert_text(/\[FILTERED\]/)
+    assert_no_text(/Jorge/)
   ensure
     FlightControl.filter_arguments = @previous_filter_arguments
   end
 
   test "click on a failed job error to see its error information" do
-    within_job_row /FailingJob\s*2/ do
+    within_job_row(/FailingJob\s*2/) do
       click_on "RuntimeError: This always fails!"
     end
 
-    assert_text /failing_job.rb/
+    assert_text(/failing_job.rb/)
   end
 
   test "show empty notice when no jobs" do
     ActiveJob.jobs.failed.discard_all
     visit jobs_path(:failed)
-    assert_text /there are no failed jobs/i
+    assert_text(/there are no failed jobs/i)
   end
 
   test "Has Clean/Full buttons when a backtrace cleaner is configured" do
@@ -67,9 +67,9 @@ class ShowFailedJobsTest < ApplicationSystemTestCase
 
       # Setup the application with what we had before *minus* a backtrace cleaner
       @applications.each do |application|
-        FlightControl.applications.add(application.name).tap do |it|
+        FlightControl.applications.add(application.name).tap do |added_application|
           application.servers.each do |server|
-            it.add_servers(server.name, server.queue_adapter)
+            added_application.add_servers(server.name, server.queue_adapter)
           end
         end
       end
@@ -91,7 +91,7 @@ class ShowFailedJobsTest < ApplicationSystemTestCase
 
   test "click on 'clean' shows a backtrace cleaned by the Rails default backtrace cleaner" do
     visit jobs_path(:failed)
-    within_job_row /FailingJob\s*2/ do
+    within_job_row(/FailingJob\s*2/) do
       click_on "RuntimeError: This always fails!"
     end
 

@@ -3,8 +3,8 @@ require_relative "lib/flight_control/version"
 Gem::Specification.new do |spec|
   spec.name = "flight_control"
   spec.version = FlightControl::VERSION
-  spec.authors = [ "Jury Razumau" ]
-  spec.email = [ "mail@razumau.net" ]
+  spec.authors = ["Jury Razumau"]
+  spec.email = ["mail@razumau.net"]
   spec.homepage = "https://github.com/razumau/flight_control"
   spec.summary = "A Solid Queue dashboard for Active Job"
   spec.license = "MIT"
@@ -33,9 +33,9 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "selenium-webdriver"
   spec.add_development_dependency "mocha"
   spec.add_development_dependency "debug"
-  spec.add_development_dependency "rubocop", "~> 1.52.0"
+  spec.add_development_dependency "rubocop"
   spec.add_development_dependency "rubocop-performance"
-  spec.add_development_dependency "rubocop-rails-omakase"
+  spec.add_development_dependency "standard"
   spec.add_development_dependency "better_html"
   spec.add_development_dependency "propshaft"
   spec.add_development_dependency "sqlite3"

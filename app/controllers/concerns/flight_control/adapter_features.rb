@@ -6,19 +6,20 @@ module FlightControl::AdapterFeatures
   end
 
   private
-    def supported_job_statuses
-      FlightControl::Current.server.queue_adapter.supported_job_statuses & ActiveJob::JobsRelation::STATUSES
-    end
 
-    def queue_pausing_supported?
-      FlightControl::Current.server.queue_adapter.supports_queue_pausing?
-    end
+  def supported_job_statuses
+    FlightControl::Current.server.queue_adapter.supported_job_statuses & ActiveJob::JobsRelation::STATUSES
+  end
 
-    def workers_exposed?
-      FlightControl::Current.server.queue_adapter.exposes_workers?
-    end
+  def queue_pausing_supported?
+    FlightControl::Current.server.queue_adapter.supports_queue_pausing?
+  end
 
-    def recurring_tasks_supported?
-      FlightControl::Current.server.queue_adapter.supports_recurring_tasks?
-    end
+  def workers_exposed?
+    FlightControl::Current.server.queue_adapter.exposes_workers?
+  end
+
+  def recurring_tasks_supported?
+    FlightControl::Current.server.queue_adapter.supports_recurring_tasks?
+  end
 end

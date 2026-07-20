@@ -19,7 +19,7 @@ module FlightControl::DatesHelper
   def timestamp_with_relative_time(time)
     time = time.to_time.utc
     safe_join [
-      tag.span(time.strftime("%Y-%m-%d %H:%M:%S UTC"), data: { controller: "local-time", local_time_datetime_value: time.iso8601 }),
+      tag.span(time.strftime("%Y-%m-%d %H:%M:%S UTC"), data: {controller: "local-time", local_time_datetime_value: time.iso8601}),
       " (#{time_ago_in_words_with_default_options(time)} ago)"
     ]
   end

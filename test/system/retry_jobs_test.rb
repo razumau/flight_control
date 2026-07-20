@@ -22,7 +22,7 @@ class RetryJobsTest < ApplicationSystemTestCase
 
   test "retry a single job" do
     assert_equal 9, job_row_elements.length
-    expected_job_id = ActiveJob.jobs.failed.detect { |job| job.serialized_arguments == [ "failing-arg-2" ] }.job_id
+    expected_job_id = ActiveJob.jobs.failed.detect { |job| job.serialized_arguments == ["failing-arg-2"] }.job_id
 
     within_job_row "failing-arg-2" do
       click_on "Retry"
@@ -37,10 +37,10 @@ class RetryJobsTest < ApplicationSystemTestCase
     assert_equal 9, job_row_elements.length
 
     fill_in "filter[job_class_name]", with: "FailingJob"
-    assert_text /6 jobs found/i
+    assert_text(/6 jobs found/i)
 
     click_on "Retry selection"
-    assert_text /retried 6 jobs/i
+    assert_text(/retried 6 jobs/i)
     assert_equal 3, job_row_elements.length
   end
 
@@ -48,10 +48,10 @@ class RetryJobsTest < ApplicationSystemTestCase
     assert_equal 9, job_row_elements.length
 
     fill_in "filter[queue_name]", with: "queue_1"
-    assert_text /4 jobs found/i
+    assert_text(/4 jobs found/i)
 
     click_on "Retry selection"
-    assert_text /retried 4 jobs/i
+    assert_text(/retried 4 jobs/i)
     assert_equal 5, job_row_elements.length
   end
 

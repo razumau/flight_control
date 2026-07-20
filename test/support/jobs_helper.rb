@@ -10,7 +10,7 @@ module JobsHelper
     application = FlightControl.applications[app_id]
     server = (server && application.servers[server]) || application.servers.first
     raise "No jobs server for application with id #{app_id} (#{server})" if server.nil?
-    server.activating &block
+    server.activating(&block)
   end
 
   def default_job_server

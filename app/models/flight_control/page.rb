@@ -1,12 +1,12 @@
 class FlightControl::Page
   DEFAULT_PAGE_SIZE = 10
 
-  attr_reader :records, :index, :page_size
+  attr_reader :index, :page_size
 
   def initialize(relation, page: 1, page_size: DEFAULT_PAGE_SIZE)
     @relation = relation
     @page_size = page_size
-    @index = [ page, 1 ].max
+    @index = [page, 1].max
   end
 
   def records
@@ -26,11 +26,11 @@ class FlightControl::Page
   end
 
   def previous_index
-    [ index - 1, 1 ].max
+    [index - 1, 1].max
   end
 
   def next_index
-    pages_count ? [ index + 1, pages_count ].min : index + 1
+    pages_count ? [index + 1, pages_count].min : index + 1
   end
 
   def pages_count
@@ -42,7 +42,8 @@ class FlightControl::Page
   end
 
   private
-    def offset
-      (index - 1) * page_size
-    end
+
+  def offset
+    (index - 1) * page_size
+  end
 end

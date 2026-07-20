@@ -2,7 +2,7 @@ require_relative "../application_system_test_case"
 
 class ListQueuesTest < ApplicationSystemTestCase
   setup do
-    create_queues *10.times.collect { |index| "queue_#{index}" }
+    create_queues(*10.times.collect { |index| "queue_#{index}" })
   end
 
   test "list queues sorted by name" do

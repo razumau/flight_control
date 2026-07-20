@@ -19,5 +19,6 @@ class FlightControl::IdentifiedElements
   end
 
   private
-    attr_reader :elements
+
+  attr_reader :elements
 end

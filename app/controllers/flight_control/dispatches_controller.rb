@@ -7,12 +7,13 @@ class FlightControl::DispatchesController < FlightControl::ApplicationController
   end
 
   private
-    def jobs_relation
-      ActiveJob.jobs
-    end
 
-    def redirect_location
-      status = @job.status.presence_in(supported_job_statuses) || :blocked
-      application_jobs_url(@application, status)
-    end
+  def jobs_relation
+    ActiveJob.jobs
+  end
+
+  def redirect_location
+    status = @job.status.presence_in(supported_job_statuses) || :blocked
+    application_jobs_url(@application, status)
+  end
 end
