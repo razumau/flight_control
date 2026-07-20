@@ -13,5 +13,6 @@ class FlightControl::Worker
   end
 
   private
-    attr_reader :queue_adapter
+
+  attr_reader :queue_adapter
 end

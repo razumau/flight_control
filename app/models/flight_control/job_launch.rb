@@ -27,48 +27,49 @@ class FlightControl::JobLaunch
     return nil unless valid?
 
     job = configured_job_class.perform_later(*positional_arguments, **keyword_arguments)
-    if job && job.successfully_enqueued?
+    if job&.successfully_enqueued?
       job
     else
       errors.add(:base, "job could not be enqueued#{": #{job.enqueue_error.message}" if job&.enqueue_error}")
       nil
     end
-  rescue StandardError => error
+  rescue => error
     errors.add(:base, "job could not be enqueued: #{error.message}")
     nil
   end
 
   private
-    def job_class
-      # Only classes from the discovered list can be launched; never constantize user input.
-      self.class.job_classes.detect { |klass| klass.name == job_class_name }
-    end
 
-    def configured_job_class
-      queue_name.present? ? job_class.set(queue: queue_name) : job_class
-    end
+  def job_class
+    # Only classes from the discovered list can be launched; never constantize user input.
+    self.class.job_classes.detect { |klass| klass.name == job_class_name }
+  end
 
-    def parsed_arguments
-      @parsed_arguments ||= JSON.parse(arguments_json.presence || "[]")
-    end
+  def configured_job_class
+    queue_name.present? ? job_class.set(queue: queue_name) : job_class
+  end
 
-    def positional_arguments
-      parsed_arguments.last.is_a?(Hash) ? parsed_arguments[0...-1] : parsed_arguments
-    end
+  def parsed_arguments
+    @parsed_arguments ||= JSON.parse(arguments_json.presence || "[]")
+  end
 
-    def keyword_arguments
-      parsed_arguments.last.is_a?(Hash) ? parsed_arguments.last.transform_keys(&:to_sym) : {}
-    end
+  def positional_arguments
+    parsed_arguments.last.is_a?(Hash) ? parsed_arguments[0...-1] : parsed_arguments
+  end
 
-    def validate_job_class
-      if job_class_name.present? && job_class.nil?
-        errors.add(:job_class_name, "is not a job class of this application")
-      end
-    end
+  def keyword_arguments
+    parsed_arguments.last.is_a?(Hash) ? parsed_arguments.last.transform_keys(&:to_sym) : {}
+  end
 
-    def validate_arguments
-      errors.add(:arguments_json, "must be a JSON array") unless parsed_arguments.is_a?(Array)
-    rescue JSON::ParserError
-      errors.add(:arguments_json, "is not valid JSON")
+  def validate_job_class
+    if job_class_name.present? && job_class.nil?
+      errors.add(:job_class_name, "is not a job class of this application")
     end
+  end
+
+  def validate_arguments
+    errors.add(:arguments_json, "must be a JSON array") unless parsed_arguments.is_a?(Array)
+  rescue JSON::ParserError
+    errors.add(:arguments_json, "is not valid JSON")
+  end
 end

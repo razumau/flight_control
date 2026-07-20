@@ -14,7 +14,7 @@ class ActiveJob::Queue
     @size ||= queue_adapter.queue_size(name)
   end
 
-  alias length size
+  alias_method :length, :size
 
   def clear
     queue_adapter.clear_queue(name)
@@ -55,8 +55,9 @@ class ActiveJob::Queue
     name.parameterize
   end
 
-  alias to_param id
+  alias_method :to_param, :id
 
   private
-    attr_reader :queue_adapter
+
+  attr_reader :queue_adapter
 end

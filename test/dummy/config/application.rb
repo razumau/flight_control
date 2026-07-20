@@ -10,7 +10,6 @@ require "solid_queue"
 Bundler.require(*Rails.groups)
 require "flight_control"
 
-
 module Dummy
   class Application < Rails::Application
     config.load_defaults Rails::VERSION::STRING.to_f
@@ -27,6 +26,6 @@ module Dummy
     # config.eager_load_paths << Rails.root.join("extras")
 
     # Flight Control configured adapters
-    config.flight_control.adapters = [ :solid_queue ]
+    config.flight_control.adapters = [:solid_queue]
   end
 end

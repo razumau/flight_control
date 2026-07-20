@@ -1,7 +1,7 @@
 require_relative "test_helper"
 
 class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
-  driven_by :selenium_chrome_headless, screen_size: [ 1200, 1000 ]
+  driven_by :selenium_chrome_headless, screen_size: [1200, 1000]
 
   include UIHelper
 
@@ -23,5 +23,5 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
 end
 
 Capybara.configure do |config|
-  config.server = :puma, { Silent: true, Threads: "10:50" }
+  config.server = :puma, {Silent: true, Threads: "10:50"}
 end

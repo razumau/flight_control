@@ -10,19 +10,20 @@ module ActiveJob::QueueAdapters::AdapterTesting
   end
 
   private
-    # Returns the adapter to test.
-    #
-    # Template method to override in child classes.
-    #
-    # E.g: +:solid_queue+
-    def queue_adapter
-      raise NotImplementedError
-    end
 
-    # Perform the jobs in the queue.
-    #
-    # Template method to override in child classes.
-    def perform_enqueued_jobs
-      raise NotImplementedError
-    end
+  # Returns the adapter to test.
+  #
+  # Template method to override in child classes.
+  #
+  # E.g: +:solid_queue+
+  def queue_adapter
+    raise NotImplementedError
+  end
+
+  # Perform the jobs in the queue.
+  #
+  # Template method to override in child classes.
+  def perform_enqueued_jobs
+    raise NotImplementedError
+  end
 end

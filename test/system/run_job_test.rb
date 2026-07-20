@@ -9,7 +9,7 @@ class RunJobTest < ApplicationSystemTestCase
     fill_in "Arguments", with: "[ 123 ]"
     click_on "Enqueue job"
 
-    assert_text /Enqueued DummyJob/
+    assert_text(/Enqueued DummyJob/)
     assert_text "123"
   end
 
@@ -21,7 +21,7 @@ class RunJobTest < ApplicationSystemTestCase
     fill_in "Arguments", with: "definitely not json"
     click_on "Enqueue job"
 
-    assert_text /is not valid JSON/
+    assert_text(/is not valid JSON/)
     assert_field "Arguments", with: "definitely not json"
   end
 end

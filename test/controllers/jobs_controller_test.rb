@@ -16,7 +16,7 @@ class FlightControl::JobsControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, job.job_id
     assert_select "div.tag a", "queue_1"
 
-    get flight_control.application_job_url(@application, job.job_id, filter: { queue_name: "queue_1" })
+    get flight_control.application_job_url(@application, job.job_id, filter: {queue_name: "queue_1"})
     assert_response :ok
 
     assert_select "h1", /DummyJob\s+pending/
@@ -44,24 +44,24 @@ class FlightControl::JobsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "get finished jobs filtered by finished_at date" do
-    [ "UTC", "International Date Line West" ].each do |timezone|
+    ["UTC", "International Date Line West"].each do |timezone|
       Time.use_zone(timezone) do
-        job = DummyJob.perform_later(42)
+        DummyJob.perform_later(42)
         perform_enqueued_jobs_async
 
         get flight_control.application_jobs_url(@application, :finished)
         assert_response :ok
         assert_select "tr.job", 1
 
-        get flight_control.application_jobs_url(@application, :finished, filter: { finished_at_start: 1.hour.from_now.strftime("%Y-%m-%dT%H:%M") })
+        get flight_control.application_jobs_url(@application, :finished, filter: {finished_at_start: 1.hour.from_now.strftime("%Y-%m-%dT%H:%M")})
         assert_response :ok
         assert_select "tr.job", 0
 
-        get flight_control.application_jobs_url(@application, :finished, filter: { finished_at_start: 1.hour.ago.strftime("%Y-%m-%dT%H:%M"), finished_at_end: 1.hour.from_now.strftime("%Y-%m-%dT%H:%M") })
+        get flight_control.application_jobs_url(@application, :finished, filter: {finished_at_start: 1.hour.ago.strftime("%Y-%m-%dT%H:%M"), finished_at_end: 1.hour.from_now.strftime("%Y-%m-%dT%H:%M")})
         assert_response :ok
         assert_select "tr.job", 1
 
-        get flight_control.application_jobs_url(@application, :finished, filter: { finished_at_end: 1.hour.from_now.strftime("%Y-%m-%dT%H:%M") })
+        get flight_control.application_jobs_url(@application, :finished, filter: {finished_at_end: 1.hour.from_now.strftime("%Y-%m-%dT%H:%M")})
         assert_response :ok
         assert_select "tr.job", 1
       end
@@ -71,7 +71,7 @@ class FlightControl::JobsControllerTest < ActionDispatch::IntegrationTest
   test "redirect to queue when job doesn't exist" do
     job = DummyJob.perform_later(42)
 
-    get flight_control.application_job_url(@application, job.job_id + "0", filter: { queue_name: "queue_1" })
+    get flight_control.application_job_url(@application, job.job_id + "0", filter: {queue_name: "queue_1"})
     assert_redirected_to flight_control.application_queue_path(@application, :queue_1)
   end
 
@@ -110,7 +110,7 @@ class FlightControl::JobsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "get jobs and job details when the default locale is set to another language than English" do
-    previous_locales, I18n.available_locales = I18n.available_locales, %i[ en nl ]
+    previous_locales, I18n.available_locales = I18n.available_locales, %i[en nl]
 
     DummyJob.set(wait: 3.minutes).perform_later
 
@@ -125,7 +125,7 @@ class FlightControl::JobsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "get jobs and job details when English is not included among the locales" do
-    previous_locales, I18n.available_locales = I18n.available_locales, %i[ es nl ]
+    previous_locales, I18n.available_locales = I18n.available_locales, %i[es nl]
 
     DummyJob.set(wait: 3.minutes).perform_later
 
@@ -142,7 +142,7 @@ class FlightControl::JobsControllerTest < ActionDispatch::IntegrationTest
     DummyReloadedJob.perform_later(42)
     perform_enqueued_jobs_async
 
-    get flight_control.application_jobs_url(@application, :finished, filter: { job_class_name: " \n\t \n\t" })
+    get flight_control.application_jobs_url(@application, :finished, filter: {job_class_name: " \n\t \n\t"})
     assert_response :ok
     assert_select "tr.job", 2
     assert_select "tr.job", /DummyJob/
@@ -154,7 +154,7 @@ class FlightControl::JobsControllerTest < ActionDispatch::IntegrationTest
     DummyReloadedJob.perform_later(42)
     perform_enqueued_jobs_async
 
-    get flight_control.application_jobs_url(@application, :finished, filter: { job_class_name: " \n\tDummyJob \n\t" })
+    get flight_control.application_jobs_url(@application, :finished, filter: {job_class_name: " \n\tDummyJob \n\t"})
     assert_response :ok
     assert_select "tr.job", 1
     assert_select "tr.job", /DummyJob/
@@ -165,7 +165,7 @@ class FlightControl::JobsControllerTest < ActionDispatch::IntegrationTest
     DummyReloadedJob.perform_later(42)
     perform_enqueued_jobs_async
 
-    get flight_control.application_jobs_url(@application, :finished, filter: { queue_name: " \n\tqueue_1 \n\t" })
+    get flight_control.application_jobs_url(@application, :finished, filter: {queue_name: " \n\tqueue_1 \n\t"})
     assert_response :ok
     assert_select "tr.job", 1
     assert_select "tr.job", /DummyJob/

@@ -32,36 +32,37 @@ class FlightControl::Authentication < Rails::Command::Base
   end
 
   private
-    attr_reader :environment
 
-    def credentials_accessible?
-      credentials.read.present?
-    end
+  attr_reader :environment
 
-    def authentication_configured?
-      %i[ http_basic_auth_user http_basic_auth_password ].any? do |key|
-        credentials.dig(:flight_control, key).present?
-      end
-    end
+  def credentials_accessible?
+    credentials.read.present?
+  end
 
-    def store_credentials(username, password)
-      content = credentials.read + "\n" + http_authentication_entry(username, password) + "\n"
-      credentials.write(content)
+  def authentication_configured?
+    %i[http_basic_auth_user http_basic_auth_password].any? do |key|
+      credentials.dig(:flight_control, key).present?
     end
+  end
 
-    def credentials
-      @credentials ||= Rails.application.encrypted(config.content_path, key_path: config.key_path)
-    end
+  def store_credentials(username, password)
+    content = credentials.read + "\n" + http_authentication_entry(username, password) + "\n"
+    credentials.write(content)
+  end
 
-    def config
-      Rails.application.config.credentials
-    end
+  def credentials
+    @credentials ||= Rails.application.encrypted(config.content_path, key_path: config.key_path)
+  end
 
-    def http_authentication_entry(username, password)
-      <<~ENTRY
-        flight_control:
-          http_basic_auth_user: #{username}
-          http_basic_auth_password: #{password}
-      ENTRY
-    end
+  def config
+    Rails.application.config.credentials
+  end
+
+  def http_authentication_entry(username, password)
+    <<~ENTRY
+      flight_control:
+        http_basic_auth_user: #{username}
+        http_basic_auth_password: #{password}
+    ENTRY
+  end
 end

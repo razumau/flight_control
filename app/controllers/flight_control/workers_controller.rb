@@ -11,13 +11,14 @@ class FlightControl::WorkersController < FlightControl::ApplicationController
   end
 
   private
-    def ensure_exposed_workers
-      unless workers_exposed?
-        redirect_to root_url, alert: "This server doesn't expose workers"
-      end
-    end
 
-    def workers_relation
-      FlightControl::Current.server.workers_relation
+  def ensure_exposed_workers
+    unless workers_exposed?
+      redirect_to root_url, alert: "This server doesn't expose workers"
     end
+  end
+
+  def workers_relation
+    FlightControl::Current.server.workers_relation
+  end
 end

@@ -3,7 +3,7 @@ module FlightControl::IdentifiedByName
 
   included do
     attr_reader :name
-    alias to_s name
+    alias_method :to_s, :name
   end
 
   def initialize(name:)
@@ -14,5 +14,5 @@ module FlightControl::IdentifiedByName
     name.parameterize
   end
 
-  alias to_param id
+  alias_method :to_param, :id
 end

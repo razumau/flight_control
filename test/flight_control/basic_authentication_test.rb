@@ -30,18 +30,19 @@ class FlightControl::BasicAuthenticationTest < ActionDispatch::IntegrationTest
   end
 
   private
-    def with_http_basic_auth(enabled: true, user: nil, password: nil)
-      previous_enabled, FlightControl.http_basic_auth_enabled = FlightControl.http_basic_auth_enabled, enabled
-      previous_user, FlightControl.http_basic_auth_user = FlightControl.http_basic_auth_user, user
-      previous_password, FlightControl.http_basic_auth_password = FlightControl.http_basic_auth_password, password
-      yield
-    ensure
-      FlightControl.http_basic_auth_enabled = previous_enabled
-      FlightControl.http_basic_auth_user = previous_user
-      FlightControl.http_basic_auth_password = previous_password
-    end
 
-    def auth_headers(user, password)
-      { Authorization: ActionController::HttpAuthentication::Basic.encode_credentials(user, password) }
-    end
+  def with_http_basic_auth(enabled: true, user: nil, password: nil)
+    previous_enabled, FlightControl.http_basic_auth_enabled = FlightControl.http_basic_auth_enabled, enabled
+    previous_user, FlightControl.http_basic_auth_user = FlightControl.http_basic_auth_user, user
+    previous_password, FlightControl.http_basic_auth_password = FlightControl.http_basic_auth_password, password
+    yield
+  ensure
+    FlightControl.http_basic_auth_enabled = previous_enabled
+    FlightControl.http_basic_auth_user = previous_user
+    FlightControl.http_basic_auth_password = previous_password
+  end
+
+  def auth_headers(user, password)
+    {Authorization: ActionController::HttpAuthentication::Basic.encode_credentials(user, password)}
+  end
 end

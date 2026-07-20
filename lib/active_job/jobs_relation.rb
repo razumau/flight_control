@@ -22,11 +22,11 @@
 class ActiveJob::JobsRelation
   include Enumerable
 
-  STATUSES = %i[ pending failed in_progress blocked scheduled finished ]
-  FILTERS = %i[ queue_name job_class_name ]
+  STATUSES = %i[pending failed in_progress blocked scheduled finished]
+  FILTERS = %i[queue_name job_class_name]
 
-  PROPERTIES = %i[ queue_name status offset_value limit_value job_class_name worker_id recurring_task_id finished_at ]
-  attr_reader *PROPERTIES, :default_page_size
+  PROPERTIES = %i[queue_name status offset_value limit_value job_class_name worker_id recurring_task_id finished_at]
+  attr_reader(*PROPERTIES, :default_page_size)
 
   delegate :last, :[], :reverse, to: :to_a
   delegate :logger, to: FlightControl
@@ -54,14 +54,13 @@ class ActiveJob::JobsRelation
   # * <tt>:finished_at</tt> - (Range) To only include the jobs finished between the provided range
   def where(job_class_name: nil, queue_name: nil, worker_id: nil, recurring_task_id: nil, finished_at: nil)
     # Remove nil arguments to avoid overriding parameters when concatenating +where+ clauses
-    arguments = { job_class_name: job_class_name,
-      queue_name: queue_name&.to_s,
-      worker_id: worker_id,
-      recurring_task_id: recurring_task_id,
-      finished_at: finished_at
-    }.compact
+    arguments = {job_class_name: job_class_name,
+                 queue_name: queue_name&.to_s,
+                 worker_id: worker_id,
+                 recurring_task_id: recurring_task_id,
+                 finished_at: finished_at}.compact
 
-    clone_with **arguments
+    clone_with(**arguments)
   end
 
   def with_status(status)
@@ -104,8 +103,8 @@ class ActiveJob::JobsRelation
     end
   end
 
-  alias length count
-  alias size count
+  alias_method :length, :count
+  alias_method :size, :count
 
   def empty?
     count == 0
@@ -119,7 +118,7 @@ class ActiveJob::JobsRelation
     "<Jobs with [#{properties_with_values}]> (loaded: #{loaded?})"
   end
 
-  alias inspect to_s
+  alias_method :inspect, :to_s
 
   def each(&block)
     loaded_jobs&.each(&block) || load_jobs(&block)
@@ -218,101 +217,105 @@ class ActiveJob::JobsRelation
   end
 
   private
-    attr_reader :queue_adapter, :loaded_jobs
-    attr_writer *PROPERTIES
 
-    def set_defaults
-      self.offset_value = 0
-      self.limit_value = ALL_JOBS_LIMIT
-    end
+  attr_reader :queue_adapter, :loaded_jobs
+  attr_writer(*PROPERTIES)
 
-    def clone_with(**properties)
-      dup.reload.tap do |relation|
-        properties.each do |key, value|
-          relation.send("#{key}=", value)
-        end
+  def set_defaults
+    self.offset_value = 0
+    self.limit_value = ALL_JOBS_LIMIT
+  end
+
+  def clone_with(**properties)
+    dup.reload.tap do |relation|
+      properties.each do |key, value|
+        relation.send("#{key}=", value)
       end
     end
+  end
 
-    def query_count
-      @count ||= queue_adapter.jobs_count(self)
+  def query_count
+    @count ||= queue_adapter.jobs_count(self)
+  end
+
+  def load_jobs
+    @loaded_jobs = []
+    perform_each do |job|
+      @loaded_jobs << job
+      yield job
     end
+  end
 
-    def load_jobs
-      @loaded_jobs = []
-      perform_each do |job|
-        @loaded_jobs << job
-        yield job
-      end
+  def perform_each
+    current_offset = offset_value
+    pending_count = limit_value || Float::INFINITY
+
+    loop do
+      limit = [pending_count, default_page_size].min
+      page = offset(current_offset).limit(limit)
+      jobs = queue_adapter.fetch_jobs(page)
+      finished = jobs.empty?
+      jobs = filter(jobs) if filtering_needed?
+      Array(jobs).each { |job| yield job }
+      current_offset += limit
+      pending_count -= jobs.length
+      break if finished || pending_count.zero?
     end
+  end
 
-    def perform_each
-      current_offset = offset_value
-      pending_count = limit_value || Float::INFINITY
+  def loaded?
+    !@loaded_jobs.nil?
+  end
 
-      begin
-        limit = [ pending_count, default_page_size ].min
-        page = offset(current_offset).limit(limit)
-        jobs = queue_adapter.fetch_jobs(page)
-        finished = jobs.empty?
-        jobs = filter(jobs) if filtering_needed?
-        Array(jobs).each { |job| yield job }
-        current_offset += limit
-        pending_count -= jobs.length
-      end until finished || pending_count.zero?
+  # Filtering for not natively supported filters is performed in memory
+  def filter(jobs)
+    jobs.filter { |job| satisfy_filter?(job) }
+  end
+
+  def satisfy_filter?(job)
+    filters.all? { |property| public_send(property) == job.public_send(property) }
+  end
+
+  def filters
+    @filters ||= FILTERS.select { |property| public_send(property).present? && !queue_adapter.supports_job_filter?(self, property) }
+  end
+
+  def ensure_failed_status
+    raise ActiveJob::Errors::InvalidOperation, "This operation can only be performed on failed jobs, but these jobs are #{status}" unless failed?
+  end
+
+  def validate_looping_in_batches_is_possible
+    raise ActiveJob::Errors::InvalidOperation, "Looping in batches is not compatible with providing offset or limit" if paginated?
+  end
+
+  def in_ascending_batches(of:)
+    current_offset = 0
+    max = count
+    loop do
+      page = offset(current_offset).limit(of)
+      current_offset += of
+      logger.info page
+      yield page
+      wait_batch_delay
+      break if current_offset >= max
     end
+  end
 
-    def loaded?
-      !@loaded_jobs.nil?
+  def in_descending_batches(of:)
+    current_offset = count - of
+
+    loop do
+      limit = (current_offset < 0) ? of + current_offset : of
+      page = offset([current_offset, 0].max).limit(limit)
+      current_offset -= of
+      logger.info page
+      yield page
+      wait_batch_delay
+      break if current_offset + of <= 0
     end
+  end
 
-    # Filtering for not natively supported filters is performed in memory
-    def filter(jobs)
-      jobs.filter { |job| satisfy_filter?(job) }
-    end
-
-    def satisfy_filter?(job)
-      filters.all? { |property| public_send(property) == job.public_send(property) }
-    end
-
-    def filters
-      @filters ||= FILTERS.select { |property| public_send(property).present? && !queue_adapter.supports_job_filter?(self, property) }
-    end
-
-    def ensure_failed_status
-      raise ActiveJob::Errors::InvalidOperation, "This operation can only be performed on failed jobs, but these jobs are #{status}" unless failed?
-    end
-
-    def validate_looping_in_batches_is_possible
-      raise ActiveJob::Errors::InvalidOperation, "Looping in batches is not compatible with providing offset or limit" if paginated?
-    end
-
-    def in_ascending_batches(of:)
-      current_offset = 0
-      max = count
-      begin
-        page = offset(current_offset).limit(of)
-        current_offset += of
-        logger.info page
-        yield page
-        wait_batch_delay
-      end until current_offset >= max
-    end
-
-    def in_descending_batches(of:)
-      current_offset = count - of
-
-      begin
-        limit = current_offset < 0 ? of + current_offset : of
-        page = offset([ current_offset, 0 ].max).limit(limit)
-        current_offset -= of
-        logger.info page
-        yield page
-        wait_batch_delay
-      end until current_offset + of <= 0
-    end
-
-    def wait_batch_delay
-      sleep FlightControl.delay_between_bulk_operation_batches if FlightControl.delay_between_bulk_operation_batches.to_i > 0
-    end
+  def wait_batch_delay
+    sleep FlightControl.delay_between_bulk_operation_batches if FlightControl.delay_between_bulk_operation_batches.to_i > 0
+  end
 end

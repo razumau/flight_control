@@ -5,12 +5,12 @@ module ActiveJob::QueueAdapters::AdapterTesting::JobBatches
   included do
     # The jobs relation lists jobs newest first, so batches in ascending
     # relation order start with the most recently enqueued jobs.
-    assert_loop jobs_count: 10, order: :asc, batch_size: 5, expected_batches: [ [ 9, 8, 7, 6, 5 ], [ 4, 3, 2, 1, 0 ] ]
-    assert_loop jobs_count: 12, order: :asc, batch_size: 5, expected_batches: [ [ 11, 10, 9, 8, 7 ], [ 6, 5, 4, 3, 2 ], [ 1, 0 ] ]
+    assert_loop jobs_count: 10, order: :asc, batch_size: 5, expected_batches: [[9, 8, 7, 6, 5], [4, 3, 2, 1, 0]]
+    assert_loop jobs_count: 12, order: :asc, batch_size: 5, expected_batches: [[11, 10, 9, 8, 7], [6, 5, 4, 3, 2], [1, 0]]
 
     # Descending order iterates the relation from its tail: oldest jobs first.
-    assert_loop jobs_count: 10, order: :desc, batch_size: 5, expected_batches: [ [ 4, 3, 2, 1, 0 ], [ 9, 8, 7, 6, 5 ] ]
-    assert_loop jobs_count: 12, order: :desc, batch_size: 5, expected_batches: [ [ 4, 3, 2, 1, 0 ], [ 9, 8, 7, 6, 5 ], [ 11, 10 ] ]
+    assert_loop jobs_count: 10, order: :desc, batch_size: 5, expected_batches: [[4, 3, 2, 1, 0], [9, 8, 7, 6, 5]]
+    assert_loop jobs_count: 12, order: :desc, batch_size: 5, expected_batches: [[4, 3, 2, 1, 0], [9, 8, 7, 6, 5], [11, 10]]
   end
 
   class_methods do

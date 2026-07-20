@@ -1,6 +1,6 @@
 class FlightControl::I18nConfig < ::I18n::Config
-  AVAILABLE_LOCALES = [ :en ]
-  AVAILABLE_LOCALES_SET = [ :en, "en" ]
+  AVAILABLE_LOCALES = [:en]
+  AVAILABLE_LOCALES_SET = [:en, "en"]
   DEFAULT_LOCALE = :en
 
   def available_locales

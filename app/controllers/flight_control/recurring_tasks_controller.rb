@@ -1,6 +1,6 @@
 class FlightControl::RecurringTasksController < FlightControl::ApplicationController
   before_action :ensure_supported_recurring_tasks
-  before_action :set_recurring_task, only: [ :show, :update ]
+  before_action :set_recurring_task, only: [:show, :update]
   before_action :ensure_recurring_task_can_be_enqueued, only: :update
 
   def index
@@ -20,19 +20,20 @@ class FlightControl::RecurringTasksController < FlightControl::ApplicationContro
   end
 
   private
-    def ensure_supported_recurring_tasks
-      unless recurring_tasks_supported?
-        redirect_to root_url, alert: "This server doesn't support recurring tasks"
-      end
-    end
 
-    def set_recurring_task
-      @recurring_task = FlightControl::Current.server.find_recurring_task(params[:id])
+  def ensure_supported_recurring_tasks
+    unless recurring_tasks_supported?
+      redirect_to root_url, alert: "This server doesn't support recurring tasks"
     end
+  end
 
-    def ensure_recurring_task_can_be_enqueued
-      unless @recurring_task.runnable?
-        redirect_to application_recurring_task_path(@application, @recurring_task.id), alert: "This task can't be enqueued"
-      end
+  def set_recurring_task
+    @recurring_task = FlightControl::Current.server.find_recurring_task(params[:id])
+  end
+
+  def ensure_recurring_task_can_be_enqueued
+    unless @recurring_task.runnable?
+      redirect_to application_recurring_task_path(@application, @recurring_task.id), alert: "This task can't be enqueued"
     end
+  end
 end

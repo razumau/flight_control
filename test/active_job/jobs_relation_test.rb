@@ -49,13 +49,13 @@ class ActiveJob::JobsRelationTest < ActiveSupport::TestCase
   end
 
   test "caches the fetched set of jobs" do
-    ActiveJob::Base.queue_adapter.expects(:fetch_jobs).twice.returns([ :job_1, :job_2 ], [])
+    ActiveJob::Base.queue_adapter.expects(:fetch_jobs).twice.returns([:job_1, :job_2], [])
     ActiveJob::Base.queue_adapter.expects(:supports_job_filter?).at_least_once.returns(true)
 
     jobs = @jobs.where(queue_name: "my_queue")
 
     5.times do
-      assert_equal [ :job_1, :job_2 ], jobs.to_a
+      assert_equal [:job_1, :job_2], jobs.to_a
     end
   end
 

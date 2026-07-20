@@ -7,16 +7,16 @@ class FlightControl::JobLaunchesControllerTest < ActionDispatch::IntegrationTest
 
     assert_select "option", "DummyJob"
     assert_select "option", "FailingJob"
-    assert_select "option", { text: "ApplicationJob", count: 0 } # no perform method
+    assert_select "option", {text: "ApplicationJob", count: 0} # no perform method
   end
 
   test "enqueue a job with positional arguments" do
     post flight_control.application_job_launches_url(@application),
-      params: { job_launch: { job_class_name: "DummyJob", arguments_json: "[ 123 ]" } }
+      params: {job_launch: {job_class_name: "DummyJob", arguments_json: "[ 123 ]"}}
 
     job = SolidQueue::Job.last
     assert_equal "DummyJob", job.class_name
-    assert_equal [ 123 ], job.arguments["arguments"]
+    assert_equal [123], job.arguments["arguments"]
 
     assert_redirected_to flight_control.application_job_url(@application, job.active_job_id)
     follow_redirect!
@@ -26,7 +26,7 @@ class FlightControl::JobLaunchesControllerTest < ActionDispatch::IntegrationTest
 
   test "enqueue a job without arguments" do
     post flight_control.application_job_launches_url(@application),
-      params: { job_launch: { job_class_name: "DummyJob", arguments_json: "" } }
+      params: {job_launch: {job_class_name: "DummyJob", arguments_json: ""}}
 
     job = SolidQueue::Job.last
     assert_equal "DummyJob", job.class_name
@@ -35,7 +35,7 @@ class FlightControl::JobLaunchesControllerTest < ActionDispatch::IntegrationTest
 
   test "a trailing JSON object is passed as keyword arguments" do
     post flight_control.application_job_launches_url(@application),
-      params: { job_launch: { job_class_name: "DummyJob", arguments_json: '[ 123, { "author": "Jorge" } ]' } }
+      params: {job_launch: {job_class_name: "DummyJob", arguments_json: '[ 123, { "author": "Jorge" } ]'}}
 
     job = SolidQueue::Job.last
     arguments = job.arguments["arguments"]
@@ -46,14 +46,14 @@ class FlightControl::JobLaunchesControllerTest < ActionDispatch::IntegrationTest
 
   test "enqueue a job on a specific queue" do
     post flight_control.application_job_launches_url(@application),
-      params: { job_launch: { job_class_name: "DummyJob", arguments_json: "[]", queue_name: "reports" } }
+      params: {job_launch: {job_class_name: "DummyJob", arguments_json: "[]", queue_name: "reports"}}
 
     assert_equal "reports", SolidQueue::Job.last.queue_name
   end
 
   test "reject a class that is not a job class" do
     post flight_control.application_job_launches_url(@application),
-      params: { job_launch: { job_class_name: "Post", arguments_json: "[]" } }
+      params: {job_launch: {job_class_name: "Post", arguments_json: "[]"}}
 
     assert_response :unprocessable_entity
     assert_select "article.is-danger li", /is not a job class/
@@ -62,7 +62,7 @@ class FlightControl::JobLaunchesControllerTest < ActionDispatch::IntegrationTest
 
   test "reject invalid JSON arguments" do
     post flight_control.application_job_launches_url(@application),
-      params: { job_launch: { job_class_name: "DummyJob", arguments_json: "not json" } }
+      params: {job_launch: {job_class_name: "DummyJob", arguments_json: "not json"}}
 
     assert_response :unprocessable_entity
     assert_select "article.is-danger li", /is not valid JSON/
@@ -71,7 +71,7 @@ class FlightControl::JobLaunchesControllerTest < ActionDispatch::IntegrationTest
 
   test "reject JSON arguments that are not an array" do
     post flight_control.application_job_launches_url(@application),
-      params: { job_launch: { job_class_name: "DummyJob", arguments_json: '{ "author": "Jorge" }' } }
+      params: {job_launch: {job_class_name: "DummyJob", arguments_json: '{ "author": "Jorge" }'}}
 
     assert_response :unprocessable_entity
     assert_select "article.is-danger li", /must be a JSON array/
@@ -80,7 +80,7 @@ class FlightControl::JobLaunchesControllerTest < ActionDispatch::IntegrationTest
 
   test "reject a missing job class" do
     post flight_control.application_job_launches_url(@application),
-      params: { job_launch: { job_class_name: "", arguments_json: "[]" } }
+      params: {job_launch: {job_class_name: "", arguments_json: "[]"}}
 
     assert_response :unprocessable_entity
     assert_nil SolidQueue::Job.last

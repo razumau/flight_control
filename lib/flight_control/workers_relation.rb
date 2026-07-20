@@ -47,32 +47,33 @@ class FlightControl::WorkersRelation
     count == 0
   end
 
-  alias length count
-  alias size count
+  alias_method :length, :count
+  alias_method :size, :count
 
   private
-    def set_defaults
-      self.offset_value = 0
-      self.limit_value = ALL_WORKERS_LIMIT
-    end
 
-    def workers
-      @workers ||= @queue_adapter.fetch_workers(self)
-    end
+  def set_defaults
+    self.offset_value = 0
+    self.limit_value = ALL_WORKERS_LIMIT
+  end
 
-    def query_count
-      @count ||= @queue_adapter.count_workers(self)
-    end
+  def workers
+    @workers ||= @queue_adapter.fetch_workers(self)
+  end
 
-    def loaded?
-      !@workers.nil?
-    end
+  def query_count
+    @count ||= @queue_adapter.count_workers(self)
+  end
 
-    def clone_with(**properties)
-      dup.reload.tap do |relation|
-        properties.each do |key, value|
-          relation.send("#{key}=", value)
-        end
+  def loaded?
+    !@workers.nil?
+  end
+
+  def clone_with(**properties)
+    dup.reload.tap do |relation|
+      properties.each do |key, value|
+        relation.send("#{key}=", value)
       end
     end
+  end
 end

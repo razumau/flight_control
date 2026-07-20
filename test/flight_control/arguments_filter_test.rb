@@ -6,14 +6,14 @@ class FlightControl::ArgumentsFilterTest < ActiveSupport::TestCase
       "deliver",
       {
         email_address: "jorge@37signals.com",
-        profile: { name: "Jorge Manrubia" },
+        profile: {name: "Jorge Manrubia"},
         message: "Hello!"
       }
     ]
-    filtered = FlightControl::ArgumentsFilter.new(%w[ email_address message ]).apply_to(arguments)
+    filtered = FlightControl::ArgumentsFilter.new(%w[email_address message]).apply_to(arguments)
 
     assert_equal "deliver", filtered[0]
-    assert_equal({ email_address: "[FILTERED]", profile: { name: "Jorge Manrubia" }, message: "[FILTERED]" }, filtered[1])
+    assert_equal({email_address: "[FILTERED]", profile: {name: "Jorge Manrubia"}, message: "[FILTERED]"}, filtered[1])
   end
 
   test "apply_to hash" do
@@ -21,8 +21,8 @@ class FlightControl::ArgumentsFilterTest < ActiveSupport::TestCase
       email_address: "jorge@37signals.com",
       message: "Hello!"
     }
-    filtered = FlightControl::ArgumentsFilter.new(%w[ message ]).apply_to(argument)
+    filtered = FlightControl::ArgumentsFilter.new(%w[message]).apply_to(argument)
 
-    assert_equal({ email_address: "jorge@37signals.com", message: "[FILTERED]" }, filtered)
+    assert_equal({email_address: "jorge@37signals.com", message: "[FILTERED]"}, filtered)
   end
 end

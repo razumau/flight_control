@@ -37,8 +37,8 @@ module ActiveJob::QueueAdapters::AdapterTesting::DiscardJobs
 
     assert_equal 7, ActiveJob.jobs.failed.count
 
-    [ 9, 8, 4, 3, 2, 1, 0 ].each.with_index do |expected_argument, index|
-      assert_equal [ expected_argument ], ActiveJob.jobs.failed[index].serialized_arguments
+    [9, 8, 4, 3, 2, 1, 0].each.with_index do |expected_argument, index|
+      assert_equal [expected_argument], ActiveJob.jobs.failed[index].serialized_arguments
     end
   end
 
@@ -75,8 +75,8 @@ module ActiveJob::QueueAdapters::AdapterTesting::DiscardJobs
 
     assert_equal 7, pending_jobs.count
 
-    [ 9, 8, 4, 3, 2, 1, 0 ].each.with_index do |expected_argument, index|
-      assert_equal [ expected_argument ], pending_jobs[index].serialized_arguments
+    [9, 8, 4, 3, 2, 1, 0].each.with_index do |expected_argument, index|
+      assert_equal [expected_argument], pending_jobs[index].serialized_arguments
     end
   end
 

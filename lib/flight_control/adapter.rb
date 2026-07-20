@@ -9,7 +9,7 @@ module FlightControl::Adapter
 
   def supported_job_statuses
     # All adapters need to support these at a minimum
-    [ :pending, :failed ]
+    [:pending, :failed]
   end
 
   def supports_job_filter?(jobs_relation, filter)
@@ -55,7 +55,6 @@ module FlightControl::Adapter
     end
   end
 
-
   # Returns an array with the list of workers. Each worker is represented as a hash
   # with these attributes:
   #   {
@@ -78,7 +77,6 @@ module FlightControl::Adapter
       raise_incompatible_adapter_error_from :find_worker
     end
   end
-
 
   # Returns an array with the list of queues. Each queue is represented as a hash
   # with these attributes:
@@ -150,7 +148,8 @@ module FlightControl::Adapter
   end
 
   private
-    def raise_incompatible_adapter_error_from(method_name)
-      raise FlightControl::Errors::IncompatibleAdapter, "Adapter #{ActiveJob.adapter_name(self)} must implement `#{method_name}`"
-    end
+
+  def raise_incompatible_adapter_error_from(method_name)
+    raise FlightControl::Errors::IncompatibleAdapter, "Adapter #{ActiveJob.adapter_name(self)} must implement `#{method_name}`"
+  end
 end

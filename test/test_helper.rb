@@ -3,7 +3,7 @@ ENV["RAILS_ENV"] = "test"
 
 require_relative "../test/dummy/config/environment"
 
-ActiveRecord::Migrator.migrations_paths = [ File.expand_path("../test/dummy/db/migrate", __dir__) ]
+ActiveRecord::Migrator.migrations_paths = [File.expand_path("../test/dummy/db/migrate", __dir__)]
 ActiveRecord::Migrator.migrations_paths << File.expand_path("../db/migrate", __dir__)
 require "rails/test_help"
 require "mocha/minitest"
@@ -12,7 +12,7 @@ require "debug"
 
 # Load fixtures from the engine
 if ActiveSupport::TestCase.respond_to?(:fixture_path=)
-  ActiveSupport::TestCase.fixture_paths = [ File.expand_path("fixtures", __dir__) ]
+  ActiveSupport::TestCase.fixture_paths = [File.expand_path("fixtures", __dir__)]
   ActionDispatch::IntegrationTest.fixture_paths = ActiveSupport::TestCase.fixture_paths
   ActiveSupport::TestCase.file_fixture_path = ActiveSupport::TestCase.fixture_paths.first + "/files"
   ActiveSupport::TestCase.fixtures :all
@@ -23,7 +23,9 @@ Dir[File.join(__dir__, "support", "*.rb")].each { |file| require file }
 Dir[File.join(__dir__, "active_job", "queue_adapters", "adapter_testing", "*.rb")].each { |file| require file }
 
 class ActiveSupport::TestCase
-  include JobsHelper, JobQueuesHelper, ThreadHelper
+  include ThreadHelper
+  include JobQueuesHelper
+  include JobsHelper
 
   setup do
     @original_applications = FlightControl.applications
@@ -38,37 +40,38 @@ class ActiveSupport::TestCase
   end
 
   private
-    def reset_executions_for_job_test_classes
-      ApplicationJob.descendants.including(ApplicationJob).each { |klass| klass.invocations&.clear }
-    end
 
-    def delete_adapters_data
-      delete_solid_queue_data
-    end
+  def reset_executions_for_job_test_classes
+    ApplicationJob.descendants.including(ApplicationJob).each { |klass| klass.invocations&.clear }
+  end
 
-    alias delete_all_jobs delete_adapters_data
+  def delete_adapters_data
+    delete_solid_queue_data
+  end
 
-    def delete_solid_queue_data
-      SolidQueue::Job.find_each(&:destroy)
-      SolidQueue::Process.find_each(&:destroy)
-      SolidQueue::RecurringTask.find_each(&:destroy)
-    end
+  alias_method :delete_all_jobs, :delete_adapters_data
 
-    def reset_configured_queues_for_job_classes
-      ApplicationJob.descendants.including(ApplicationJob).each { |klass| klass.queue_as :default }
-    end
+  def delete_solid_queue_data
+    SolidQueue::Job.find_each(&:destroy)
+    SolidQueue::Process.find_each(&:destroy)
+    SolidQueue::RecurringTask.find_each(&:destroy)
+  end
+
+  def reset_configured_queues_for_job_classes
+    ApplicationJob.descendants.including(ApplicationJob).each { |klass| klass.queue_as :default }
+  end
 end
 
 class ActionDispatch::IntegrationTest
   # Integration tests just use Solid Queue for now
   setup do
-    FlightControl.applications.add("integration-tests", { solid_queue: queue_adapter_for_test })
+    FlightControl.applications.add("integration-tests", {solid_queue: queue_adapter_for_test})
 
     @application = FlightControl.applications["integration-tests"]
     @server = @application.servers[:solid_queue]
     @worker = SolidQueue::Worker.new(queues: "*", threads: 2, polling_interval: 0.01)
 
-    recurring_task = { periodic_pause_job: { class: "PauseJob", schedule: "every second" } }
+    recurring_task = {periodic_pause_job: {class: "PauseJob", schedule: "every second"}}
     @scheduler = SolidQueue::Scheduler.new(recurring_tasks: recurring_task)
   end
 
@@ -78,29 +81,30 @@ class ActionDispatch::IntegrationTest
   end
 
   private
-    def queue_adapter_for_test
-      ActiveJob::QueueAdapters::SolidQueueAdapter.new
-    end
 
-    def register_workers(count: 1)
-      count.times { |i| SolidQueue::Process.register(kind: "Worker", pid: i, name: "worker-#{i}") }
-    end
+  def queue_adapter_for_test
+    ActiveJob::QueueAdapters::SolidQueueAdapter.new
+  end
 
-    def perform_enqueued_jobs_async(wait: 1.second)
-      @worker.start
-      wait_until_registered(@worker)
-      sleep(wait)
+  def register_workers(count: 1)
+    count.times { |i| SolidQueue::Process.register(kind: "Worker", pid: i, name: "worker-#{i}") }
+  end
 
-      yield if block_given?
-      @worker.stop
-    end
+  def perform_enqueued_jobs_async(wait: 1.second)
+    @worker.start
+    wait_until_registered(@worker)
+    sleep(wait)
 
-    def schedule_recurring_tasks_async(wait: 1.second)
-      @scheduler.start
-      wait_until_registered(@scheduler)
-      sleep(wait)
+    yield if block_given?
+    @worker.stop
+  end
 
-      yield if block_given?
-      @scheduler.stop
-    end
+  def schedule_recurring_tasks_async(wait: 1.second)
+    @scheduler.start
+    wait_until_registered(@scheduler)
+    sleep(wait)
+
+    yield if block_given?
+    @scheduler.stop
+  end
 end
