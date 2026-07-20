@@ -27,6 +27,7 @@ jobs:
       CI: true
       BUNDLE_GITHUB__COM: x-access-token:${{ secrets.GH_TOKEN }}
     strategy:
+      fail-fast: false
       matrix:
         ruby-version: ['3.3', '3.4', '4.0']
     steps:
