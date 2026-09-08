@@ -1,6 +1,10 @@
 module FlightControl::NavigationHelper
   attr_reader :page_title, :current_section
 
+  def back_to_main_app_path
+    FlightControl.back_to_main_app_path.presence || main_app.try(:root_path)
+  end
+
   def navigation_sections
     {queues: ["Queues", application_queues_path(@application)]}.tap do |sections|
       supported_job_statuses.without(:pending).each do |status|

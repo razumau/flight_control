@@ -12,6 +12,6 @@ class FlightControl::QueuesController < FlightControl::ApplicationController
   private
 
   def set_queue
-    @queue = ActiveJob.queues[params[:id]]
+    @queue = ActiveJob.queues[params[:id]] or raise FlightControl::Errors::ResourceNotFound, "Queue '#{params[:id]}' not found"
   end
 end

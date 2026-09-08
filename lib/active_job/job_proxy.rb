@@ -28,7 +28,8 @@ class ActiveJob::JobProxy < ActiveJob::Base
 
   def duration
     ended_at = finished_at || failed_at
-    ended_at - scheduled_at if ended_at && scheduled_at
+    started_at = scheduled_at || enqueued_at
+    ended_at - started_at if ended_at && started_at
   end
 
   ActiveJob::JobsRelation::STATUSES.each do |status|

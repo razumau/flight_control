@@ -38,12 +38,18 @@ module FlightControl
       end
     end
 
+    initializer "flight_control.host_route_helpers" do |app|
+      ActiveSupport.on_load(:after_routes_loaded) do
+        FlightControl::HostRouteHelpers.define_from(app.routes, FlightControl::Engine.routes)
+      end
+    end
+
     initializer "flight_control.http_basic_auth" do |app|
       FlightControl.http_basic_auth_user ||= app.credentials.dig(:flight_control, :http_basic_auth_user)
       FlightControl.http_basic_auth_password ||= app.credentials.dig(:flight_control, :http_basic_auth_password)
     end
 
-    initializer "flight_control.active_job.extensions" do
+    initializer "flight_control.active_job.extensions", before: "active_job.set_configs" do
       ActiveSupport.on_load :active_job do
         include ActiveJob::Querying
         include ActiveJob::Executing

@@ -41,6 +41,29 @@ class FlightControl::JobsControllerTest < ActionDispatch::IntegrationTest
     assert_select "h1", /AutoRetryingJob\s+failed\s+/
     assert_includes response.body, job.job_id
     assert_select "div.is-danger", "failed"
+    assert_select "tr", /Retries\s+2/
+  end
+
+  test "get scheduled jobs flagging retries" do
+    DummyJob.set(wait: 1.hour).perform_later(42)
+    DummyJob.new(43).tap { |job| job.executions = 1 }.enqueue(wait: 1.hour)
+
+    get flight_control.application_jobs_url(@application, :scheduled)
+    assert_response :ok
+
+    assert_select "tr.job", 2
+    assert_select "tr.job div.tag", text: "1st retry", count: 1
+  end
+
+  test "get blocked jobs with their expiration" do
+    BlockingJob.perform_later(42)
+    BlockingJob.perform_later(43)
+
+    get flight_control.application_jobs_url(@application, :blocked)
+    assert_response :ok
+
+    assert_select "tr.job", 1
+    assert_select "tr.job span[title=?]", SolidQueue::BlockedExecution.last.expires_at.to_fs(:long), /in \d+ minutes/
   end
 
   test "get finished jobs filtered by finished_at date" do
@@ -66,6 +89,52 @@ class FlightControl::JobsControllerTest < ActionDispatch::IntegrationTest
         assert_select "tr.job", 1
       end
     end
+  end
+
+  test "get failed jobs filtered by enqueued_at date" do
+    FailingJob.perform_later(42)
+    perform_enqueued_jobs_async
+
+    get flight_control.application_jobs_url(@application, :failed)
+    assert_response :ok
+    assert_select "tr.job", 1
+    assert_select "input[name='filter[enqueued_at_start]']"
+    assert_select "input[name='filter[scheduled_at_start]']", 0
+
+    get flight_control.application_jobs_url(@application, :failed, filter: {enqueued_at_start: 1.hour.from_now.strftime("%Y-%m-%dT%H:%M")})
+    assert_response :ok
+    assert_select "tr.job", 0
+
+    get flight_control.application_jobs_url(@application, :failed, filter: {enqueued_at_start: 1.hour.ago.strftime("%Y-%m-%dT%H:%M"), enqueued_at_end: 1.hour.from_now.strftime("%Y-%m-%dT%H:%M")})
+    assert_response :ok
+    assert_select "tr.job", 1
+
+    get flight_control.application_jobs_url(@application, :failed, filter: {enqueued_at_end: 1.hour.ago.strftime("%Y-%m-%dT%H:%M")})
+    assert_response :ok
+    assert_select "tr.job", 0
+  end
+
+  test "get scheduled jobs filtered by scheduled_at date" do
+    DummyJob.set(wait: 30.minutes).perform_later(42)
+    DummyJob.set(wait: 3.hours).perform_later(43)
+
+    get flight_control.application_jobs_url(@application, :scheduled)
+    assert_response :ok
+    assert_select "tr.job", 2
+    assert_select "input[name='filter[scheduled_at_start]']"
+    assert_select "input[name='filter[finished_at_start]']", 0
+
+    get flight_control.application_jobs_url(@application, :scheduled, filter: {scheduled_at_start: 1.hour.from_now.strftime("%Y-%m-%dT%H:%M")})
+    assert_response :ok
+    assert_select "tr.job", 1
+
+    get flight_control.application_jobs_url(@application, :scheduled, filter: {scheduled_at_start: 15.minutes.from_now.strftime("%Y-%m-%dT%H:%M"), scheduled_at_end: 45.minutes.from_now.strftime("%Y-%m-%dT%H:%M")})
+    assert_response :ok
+    assert_select "tr.job", 1
+
+    get flight_control.application_jobs_url(@application, :scheduled, filter: {scheduled_at_end: 15.minutes.from_now.strftime("%Y-%m-%dT%H:%M")})
+    assert_response :ok
+    assert_select "tr.job", 0
   end
 
   test "redirect to queue when job doesn't exist" do

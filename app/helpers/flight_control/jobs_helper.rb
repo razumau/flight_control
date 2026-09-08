@@ -43,6 +43,10 @@ module FlightControl::JobsHelper
     job.scheduled_at.before?(FlightControl.scheduled_job_delay_threshold.ago)
   end
 
+  def blocked_job_expiration(job)
+    "Expires #{bidirectional_time_distance_in_words_with_title(job.blocked_until)}".html_safe if job.blocked_until
+  end
+
   private
 
   DURATION_UNIT_ABBREVIATIONS = {years: "y", months: "mo", weeks: "w", days: "d", hours: "h", minutes: "m", seconds: "s"}

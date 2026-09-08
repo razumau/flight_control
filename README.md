@@ -107,6 +107,23 @@ If you do this, you can disable the default HTTP Basic Authentication using the 
 config.flight_control.http_basic_auth_enabled = false
 ```
 
+Your base controller's code runs inside the engine, whose route helpers take precedence. Route helpers of your app that Flight Control doesn't define itself, like `new_session_path` from Rails' authentication generator, still work as they are, for example from a `before_action` that redirects to the login page. Helpers that both your app and Flight Control define, like `root_path`, resolve to Flight Control's; use `main_app.root_path` to reach your app's.
+
+#### Authentication via route constraints
+
+You can also keep authentication out of Flight Control's controllers altogether and restrict access when mounting the engine, using [route constraints](https://guides.rubyonrails.org/routing.html#advanced-constraints). For example, with the sessions created by Rails' authentication generator:
+
+```ruby
+# config/routes.rb
+Rails.application.routes.draw do
+  constraints ->(request) { Session.find_by(id: request.cookie_jar.signed[:session_id])&.user&.admin? } do
+    mount FlightControl::Engine, at: "/jobs"
+  end
+end
+```
+
+Requests that don't satisfy the constraint never reach the engine. As with a custom base controller, disable HTTP Basic Authentication if you don't want both.
+
 ### Other configuration settings
 
 Besides `base_controller_class`, you can also set the following for `FlightControl` or `config.flight_control`:
@@ -116,6 +133,7 @@ Besides `base_controller_class`, you can also set the following for `FlightContr
 - `internal_query_count_limit`: in count queries, the maximum number of records that will be counted if the adapter needs to limit these queries. True counts above this number will be returned as `INFINITY`. This keeps count queries fast—defaults to `500,000`
 - `scheduled_job_delay_threshold`: the time duration before a scheduled job is considered delayed. Defaults to `1.minute` (a job is considered delayed if it hasn't transitioned from the `scheduled` status 1 minute after the scheduled time).
 - `show_console_help`: whether to show the console help. If you don't want the console help message, set this to `false`—defaults to `true`.
+- `back_to_main_app_path`: an optional string path for the "Back to main app" link. Example: `'/admin'`. Defaults to the host app's `root_path` when available.
 - `backtrace_cleaner`: a backtrace cleaner used for optionally filtering backtraces on the Failed Jobs detail page. Defaults to `Rails::BacktraceCleaner.new`. See the [Advanced configuration](#advanced-configuration) section for how to configure/override this setting on a per application/server basis.
 - `filter_arguments`: an array of strings representing the job argument keys you want to filter out in the UI. This is useful for hiding sensitive user data. Currently, only root-level hash keys are supported.
 
@@ -223,6 +241,11 @@ ActiveJob.jobs.finished.where(job_class_name: "SomeJob")
 
 # All jobs in progress being run by a given worker
 ActiveJob.jobs.in_progress.where(worker_id: 42)
+
+# Filtering by dates takes a range, which can be open on either end
+ActiveJob.jobs.failed.where(enqueued_at: 2.days.ago..)
+ActiveJob.jobs.scheduled.where(scheduled_at: Time.now..1.hour.from_now)
+ActiveJob.jobs.finished.where(finished_at: ..1.week.ago)
 ```
 
 Some examples of bulk operations:

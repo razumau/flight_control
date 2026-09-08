@@ -9,6 +9,7 @@ class FlightControl::ApplicationController < FlightControl.base_controller_class
   helper FlightControl::ApplicationHelper unless self < FlightControl::ApplicationHelper
   helper Importmap::ImportmapTagsHelper unless self < Importmap::ImportmapTagsHelper
 
+  include FlightControl::HostRouteHelpers
   include FlightControl::BasicAuthentication
   include FlightControl::NotFoundRedirections
   include FlightControl::ApplicationScoped
@@ -20,7 +21,7 @@ class FlightControl::ApplicationController < FlightControl.base_controller_class
   private
 
   def default_url_options
-    {server_id: FlightControl::Current.server}
+    super.merge(server_id: FlightControl::Current.server)
   end
 
   def set_current_locale(&block)
