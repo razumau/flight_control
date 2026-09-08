@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [2.0.0.beta.2] - 2026-09-08
+
 Ported from mission_control-jobs (upstream 1.1.0...1.2.0 and later):
 
 - Adds `enqueued_at` and `scheduled_at` date-range filters, applied natively by Solid Queue.
@@ -21,7 +23,7 @@ Ported from mission_control-jobs (upstream 1.1.0...1.2.0 and later):
 - Fixes `JobProxy#duration` when `scheduled_at` isn't set.
 - Avoids N+1 count queries when listing Solid Queue queues.
 
-## [2.0.0] - 2026-07-20
+## [2.0.0.beta.1] - 2026-07-20
 
 - Drops support for Resque and Async adapters to focus on Solid Queue.
 - Drops support for Rails versions below 8.1.
