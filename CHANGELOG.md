@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## [2.0.0.beta.3] - 2026-09-09
+
+- Adds back `app/` and `config/` directories to the packaged gem.
+
 ## [2.0.0.beta.2] - 2026-09-08
 
 Ported from mission_control-jobs (upstream 1.1.0...1.2.0 and later):
